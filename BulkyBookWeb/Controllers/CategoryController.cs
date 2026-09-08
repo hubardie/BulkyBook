@@ -13,7 +13,12 @@ namespace BulkyBookWeb.Controllers
         public IActionResult Index()
         {
             var categories = _context.Categories.ToList();
-            return View(nameof(Index), categories);
+            return View(categories);
+        }
+
+        public IActionResult Create()
+        {
+            return View();
         }
     }
 }

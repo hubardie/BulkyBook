@@ -1,6 +1,8 @@
-﻿using BulkyBookWeb.Data;
+﻿using AspNetCoreGeneratedDocument;
+using BulkyBookWeb.Data;
 using BulkyBookWeb.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BulkyBookWeb.Controllers
 {
@@ -73,6 +75,41 @@ namespace BulkyBookWeb.Controllers
                 return RedirectToAction("Index");
             }
             return View();
+        }
+
+
+        public IActionResult Delete(int? id)
+        {
+            if (id == null && id == 0)
+            {
+                return NotFound();
+            }
+
+            var category = _context.Categories.FirstOrDefault(c => c.Id == id);
+
+            if (category == null)
+            {
+                return NotFound();
+            }
+
+            return View(category);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken] // Validates that the request comes from the webpage
+        [ActionName("Delete")]
+        public IActionResult DeletePOST(int? Id)
+        {
+            var category = _context.Categories.Find(Id);
+
+            if (category == null)
+            {
+                return NotFound();
+            }
+
+            _context.Categories.Remove(category);
+            _context.SaveChanges();
+            return RedirectToAction(nameof(Index));
         }
     }
 }

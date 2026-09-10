@@ -4,6 +4,17 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <WcfConfigValidationEnabled>True</WcfConfigValidationEnabled>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BulkyBook.Models\BulkyBook.Models.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Services\CategoryService.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
 
 </Project>

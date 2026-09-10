@@ -1,8 +1,7 @@
 ﻿using AspNetCoreGeneratedDocument;
-using BulkyBookWeb.Data;
-using BulkyBookWeb.Models;
+using BulkyBook.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using BulkyBook.DataAccess.Data;
 
 namespace BulkyBookWeb.Controllers
 {

@@ -1,32 +1,49 @@
-﻿using BulkyBook.Models;
+﻿using BulkyBook.DataAccess.Data;
+using BulkyBook.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace BulkyBook.Business.IServices
 {
     public class CategoryService : ICategoryService
     {
-        public Task<Category> CreateCategoryAsync(Category category)
+        private readonly ApplicationDbContext _context;
+        public async Task<IEnumerable<Category>> GetAllcategoriesAsync()
         {
-            throw new NotImplementedException();
+            return await _context.Categories.ToListAsync();
+        }
+        public async Task<Category?> GetCategoryByIdASync(int id)
+        {
+            return await _context.Categories.FindAsync(id); 
+        }
+        public CategoryService(ApplicationDbContext context)
+        {
+            _context = context;
         }
 
-        public Task DeleteCategoryAsync(int id)
+        public  async Task<Category> CreateCategoryAsync(Category category)
         {
-            throw new NotImplementedException();
+            _context.Add(category);
+            await _context.SaveChangesAsync();
+            return category;
         }
 
-        public Task<IEnumerable<Category>> GetAllcategoriesAsync()
+        public async Task DeleteCategoryAsync(int id)
         {
-            throw new NotImplementedException();
+            var category = await _context.Categories.FindAsync(id);
+            if (category == null)
+            {
+                throw new KeyNotFoundException($"Category {id} not found");
+            }
+            _context.Remove(category);
+            await _context.SaveChangesAsync();  
         }
 
-        public Task<Category?> GetCategoryByIdASync(int id)
-        {
-            throw new NotImplementedException();
-        }
+       
 
-        public Task<Category> UpdateCategoryAsync(Category category)
+        public async Task UpdateCategoryAsync(Category category)
         {
-            throw new NotImplementedException();
+            _context.Categories.Update(category);
+            await _context.SaveChangesAsync();
         }
     }
 

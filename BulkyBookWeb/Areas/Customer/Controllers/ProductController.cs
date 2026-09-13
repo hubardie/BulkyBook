@@ -17,7 +17,6 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             var products = await _productService.GetAllProductsAsync();
             return View(products);
         }
-
         public IActionResult Create()
         {
             return View();
@@ -95,5 +94,15 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             TempData["success"] = "Product deleted succesfully";
             return RedirectToAction(nameof(Index));
         }
+
+        #region "API CALLS"
+        public async Task<IActionResult> GetAll()
+        {
+            var products = await _productService.GetAllProductsAsync();
+            return Json(new { data = products });
+        }
+        #endregion
     }
+
+
 }

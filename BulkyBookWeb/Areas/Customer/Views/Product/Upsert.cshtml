@@ -40,20 +40,18 @@
 
                             
                 </div>
-                <div class="col-lg-4">
-                    <!-- Image -->
-                </div>
+
                 <div class="border rounded p-3 mt-3 bg-light">
                     <p class="text-uppercase fw-semibold text-secondary mb-3" style="font-size:0.65rem; letter-spacing: 0.1em;">Pricing</p>
                     <div class="row g-3">
                         <div class="col-6 col-md-3">
                             <label asp-for="ListPrice" class="form-label fw-semibold small"></label>
-                            <input type="text" name="ListPrice" asp-for="ListPrice" class="form-control"/>
+                            <input type="text" name="ListPrice" asp-for="ListPrice" class="form-control" />
                             <span asp-validation-for="ListPrice" class="text-danger small"></span>
                         </div>
                         <div class="col-6 col-md-3">
                             <label asp-for="Price" class="form-label fw-semibold small"></label>
-                            <input type="text" name="Price" asp-for="Price" class="form-control"/>
+                            <input type="text" name="Price" asp-for="Price" class="form-control" />
                             <span asp-validation-for="Price" class="text-danger small"></span>
                         </div>
                         <div class="col-6 col-md-3">
@@ -63,10 +61,20 @@
                         </div>
                         <div class="col-6 col-md-3">
                             <label asp-for="Price100" class="form-label fw-semibold small"></label>
-                            <input type="text" name="Price100" asp-for="Price100" class="form-control"/>
+                            <input type="text" name="Price100" asp-for="Price100" class="form-control" />
                             <span asp-validation-for="Price100" class="text-danger small"></span>
                         </div>
                     </div>
+                </div>
+                <div class="mt-3">
+                    <label asp-for="CategoryId" class="form-label fw-semibold small"></label>
+                    <select asp-for="CategoryId" asp-items="@(ViewData["categoryList"] as IEnumerable<SelectListItem>)" class="form-control" >
+                        <option disabled selected>--Select Category--</option>
+                    </select>
+                    <span asp-validation-for="CategoryId" class="text-danger small"></span>
+                </div>
+                <div class="col-lg-4">
+                    <!-- Image -->
                 </div>
                 <div class="d-flex gap-2 mt-4">
                     <button type="submit" class="btn btn-accent fw-semibold">Create Product</button>

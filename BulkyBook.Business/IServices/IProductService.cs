@@ -6,7 +6,7 @@ namespace BulkyBook.Business.IServices
     { 
         Task<Product?> GetProductByIdASync(int id);
         Task<IEnumerable<Product>> GetAllProductsAsync();
-        Task<Product> CreateProductyAsync(Product product);
+        Task<Product> CreateProductAsync(Product product);
         Task UpdateProductAsync(Product product);
         Task DeleteProductAsync(int id);
         Task<bool> IsProductTitleUniqueAsync(string name, int? ProductId = null);

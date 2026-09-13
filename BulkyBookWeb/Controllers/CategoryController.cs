@@ -10,13 +10,13 @@ namespace BulkyBookWeb.Controllers
     public class CategoryController : Controller
     {
         private readonly ICategoryService _categoryService;
-        public CategoryController(CategoryService service)
+        public CategoryController(ICategoryService service)
         {
             _categoryService = service;            
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var categories = _categoryService.GetAllcategoriesAsync();
+            var categories = await _categoryService.GetAllcategoriesAsync();
             return View(categories);
         }
 
@@ -30,7 +30,7 @@ namespace BulkyBookWeb.Controllers
         [ActionName("Create")]
         public async Task<IActionResult> CreatePOST(Category category)
         {
-            if (await _categoryService.IsCategoryNameUniqueAsync(category.Name))
+            if (!await _categoryService.IsCategoryNameUniqueAsync(category.Name))
             {
                 ModelState.AddModelError("", "Category name already exists");
             }
@@ -65,7 +65,7 @@ namespace BulkyBookWeb.Controllers
         [ActionName("Update")]
         public async Task<IActionResult> UpdatePOST(Category category)
         {
-            if (!string.IsNullOrEmpty(category.Name) && await _categoryService.IsCategoryNameUniqueAsync(category.Name, category.Id))
+            if (!string.IsNullOrEmpty(category.Name) && !await _categoryService.IsCategoryNameUniqueAsync(category.Name, category.Id))
             {
                 ModelState.AddModelError("", "Category name already exists");
             }

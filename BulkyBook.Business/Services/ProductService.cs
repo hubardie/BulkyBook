@@ -8,9 +8,14 @@ namespace BulkyBook.Business.Services
     public class ProductService : IProductService
     {
         private readonly ApplicationDbContext _context;
-        public async Task<IEnumerable<Product>> GetAllProductsAsync()
+        public async Task<IEnumerable<Product>> GetAllProductsAsync(bool includeCategory = false)
         {
-            return await _context.Products.ToListAsync();
+            var products = _context.Products.AsQueryable();
+            if (includeCategory)
+            {
+                products = products.Include(p => p.Category);
+            }
+            return await products.ToListAsync();
         }
         public async Task<Product?> GetProductByIdASync(int id)
         {

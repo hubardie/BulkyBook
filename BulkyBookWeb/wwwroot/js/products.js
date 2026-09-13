@@ -5,9 +5,7 @@
         { data: 'isbn' },
         { data: 'price' },
         { data: 'author' },
-        { data: 'category' },
-        { defaultContent: '' },
-
+        { data: 'category.name' },
         { defaultContent: ''}
     ]
 });

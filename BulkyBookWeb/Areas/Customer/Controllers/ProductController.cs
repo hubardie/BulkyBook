@@ -14,8 +14,7 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            var products = await _productService.GetAllProductsAsync();
-            return View(products);
+            return View();
         }
         public IActionResult Create()
         {
@@ -98,7 +97,7 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
         #region "API CALLS"
         public async Task<IActionResult> GetAll()
         {
-            var products = await _productService.GetAllProductsAsync();
+            var products = await _productService.GetAllProductsAsync(true);
             return Json(new { data = products });
         }
         #endregion

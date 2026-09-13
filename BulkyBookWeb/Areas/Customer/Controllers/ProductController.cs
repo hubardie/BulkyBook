@@ -49,7 +49,20 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
                 TempData["success"] = "Product created succesfully";
                 return RedirectToAction("Index");
             }
-            return View();
+            else
+            { 
+                var categories = await _categoryService.GetAllcategoriesAsync();
+                ProductVM productVM = new()
+                {
+                    CategoryList = categories.Select(c => new SelectListItem
+                    {
+                        Text = c.Name,
+                        Value = c.Id.ToString()
+                    }),
+                    Product = new Product()
+                };
+                return View(productVM);
+            }
         }
 
         public async Task<IActionResult> Delete(int? id)

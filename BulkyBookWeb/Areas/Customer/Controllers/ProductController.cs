@@ -16,15 +16,15 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
         {
             return View();
         }
-        public IActionResult Create()
+        public IActionResult Upsert()
         {
             return View();
         }
         
         [HttpPost]
         [ValidateAntiForgeryToken] // Validates that the request comes from the webpage
-        [ActionName("Create")]
-        public async Task<IActionResult> CreatePOST(Product product)
+        [ActionName("Upsert")]
+        public async Task<IActionResult> UpsertPOST(Product product)
         {
             if (ModelState.IsValid)
             {             
@@ -34,39 +34,7 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             }
             return View();
         }
-
-        public async Task<IActionResult> Update(int? id)
-        {
-            if (id == null && id == 0)
-            {
-                return NotFound();            
-            }
-
-            var product = await _productService.GetProductByIdASync(id.Value);
-
-            if (product == null)
-            { 
-                return NotFound();
-            }
-
-            return View(product);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken] // Validates that the request comes from the webpage
-        [ActionName("Update")]
-        public async Task<IActionResult> UpdatePOST(Product product)
-        {          
-            if (ModelState.IsValid)
-            {
-                await _productService.UpdateProductAsync(product);
-                TempData["success"] = "Product  updated succesfully";
-                return RedirectToAction("Index");
-            }
-            return View();
-        }
-
-
+      
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null && id == 0)

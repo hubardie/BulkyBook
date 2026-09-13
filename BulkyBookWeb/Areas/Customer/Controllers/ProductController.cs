@@ -1,5 +1,6 @@
 ﻿using BulkyBook.Business.IServices;
 using BulkyBook.Models;
+using BulkyBook.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -22,32 +23,35 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
         }
         public async Task<IActionResult> Upsert()
         {
-            IEnumerable<SelectListItem> categoryList = (await _categoryService.GetAllcategoriesAsync()).Select(c => new SelectListItem
+            var categories = await _categoryService.GetAllcategoriesAsync();
+
+            ProductVM productVm = new()
             {
-                Text = c.Name,
-                Value = c.Id.ToString()
-            });
+                CategoryList = categories.Select(c => new SelectListItem
+                {
+                    Text = c.Name,
+                    Value = c.Id.ToString()
+                }),
+                Product = new Product()
+            };
 
-            //ViewData["categoryList"] = categoryList;
-            ViewBag.CategoryList = categoryList;
-
-            return View();
+            return View(productVm);
         }
-        
+
         [HttpPost]
         [ValidateAntiForgeryToken] // Validates that the request comes from the webpage
         [ActionName("Upsert")]
         public async Task<IActionResult> UpsertPOST(Product product)
         {
             if (ModelState.IsValid)
-            {             
+            {
                 await _productService.CreateProductAsync(product);
                 TempData["success"] = "Product created succesfully";
                 return RedirectToAction("Index");
             }
             return View();
         }
-      
+
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null && id == 0)

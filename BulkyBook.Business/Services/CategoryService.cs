@@ -1,8 +1,9 @@
-﻿using BulkyBook.DataAccess.Data;
+﻿using BulkyBook.Business.IServices;
+using BulkyBook.DataAccess.Data;
 using BulkyBook.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace BulkyBook.Business.IServices
+namespace BulkyBook.Business.Services
 {
     public class CategoryService : ICategoryService
     {
@@ -45,6 +46,20 @@ namespace BulkyBook.Business.IServices
             _context.Categories.Update(category);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<bool> IsCategoryNameUniqueAsync(string name, int? categoryId = null) 
+        {
+            if (categoryId.HasValue)
+            {
+                return !await _context.Categories.AnyAsync(c => c.Name.ToLower() == name.ToLower() && c.Id != categoryId.Value);
+            }
+            else
+            {
+                return !await _context.Categories.AnyAsync(c => c.Name.ToLower() == name.ToLower());
+            }   
+
+        }
+
     }
 
 }

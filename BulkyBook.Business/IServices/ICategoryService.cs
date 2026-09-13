@@ -7,8 +7,10 @@ namespace BulkyBook.Business.IServices
         Task<Category?> GetCategoryByIdASync(int id);
         Task<IEnumerable<Category>> GetAllcategoriesAsync();
         Task<Category> CreateCategoryAsync(Category category);
-        Task<Category> UpdateCategoryAsync(Category category);
+        Task UpdateCategoryAsync(Category category);
         Task DeleteCategoryAsync(int id);
+
+        Task<bool> IsCategoryNameUniqueAsync(string name, int? categoryId = null);
 
     }
 

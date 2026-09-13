@@ -41,7 +41,7 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken] // Validates that the request comes from the webpage
         [ActionName("Upsert")]
-        public async Task<IActionResult> UpsertPOST(Product product)
+        public async Task<IActionResult> UpsertPOST(Product product, IFormFile? file)
         {
             if (ModelState.IsValid)
             {

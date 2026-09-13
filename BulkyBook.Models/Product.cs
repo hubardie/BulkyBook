@@ -25,17 +25,17 @@ namespace BulkyBook.Models
         public string Author { get; set; } = string.Empty;
 
         [Required]
-        [Range(1, 1000, ErrorMessage = "Must be a vaue between 1 and 1000")]
+        [Range(1, 1000, ErrorMessage = "Must be a value between 1 and 1000")]
         [Display(Name = "List Price")]
         public double ListPrice { get; set; }
         
         [Required]
-        [Range(1, 1000, ErrorMessage = "Must be a vaue between 1 and 1000")]
+        [Range(1, 1000, ErrorMessage = "Must be a value between 1 and 1000")]
         [Display(Name = "Price for 1-50")]
         public double Price { get; set; }
 
         [Required]
-        [Range(1, 1000, ErrorMessage = "Must be a vaue between 1 and 1000")]
+        [Range(1, 1000, ErrorMessage = "Must be a value between 1 and 1000")]
         [Display(Name = "Price for 50+")]
         public double Price50 { get; set; }
 
@@ -45,7 +45,7 @@ namespace BulkyBook.Models
 
         [Display(Name = "Category")]
         public int CategoryId { get; set; }
-        
+        [ValidateNever]
         [ForeignKey("CategoryId")]
         public Category Category { get; set; }
 

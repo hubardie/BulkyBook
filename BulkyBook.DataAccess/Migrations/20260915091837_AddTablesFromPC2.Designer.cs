@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BulkyBook.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260913124537_RestoreCompleteDataBaseInLesson61")]
-    partial class RestoreCompleteDataBaseInLesson61
+    [Migration("20260915091837_AddTablesFromPC2")]
+    partial class AddTablesFromPC2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

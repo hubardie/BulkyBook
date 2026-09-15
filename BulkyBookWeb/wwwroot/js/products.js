@@ -14,7 +14,7 @@
         {
             data: 'id', "width": "25%", "render": function (data) {
                 return `<div class="d-flex gap-2 justify-content-end">
-                            <a href= "product/update?id=${data}" class="btn btn-sm btn-outline-success">
+                            <a href= "product/upsert?id=${data}" class="btn btn-sm btn-outline-success">
                                 <i class="bi bi-pencil-square"></i>Edit
                             </a>
                             <a href= "product/delete?id=${data}" class="btn btn-sm btn-outline-danger">

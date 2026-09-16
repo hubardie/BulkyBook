@@ -42,6 +42,7 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             }
             else
             {
+                // update
                 productVm.Product = await _productService.GetProductByIdASync(id.Value);
             }
             return View(productVm);

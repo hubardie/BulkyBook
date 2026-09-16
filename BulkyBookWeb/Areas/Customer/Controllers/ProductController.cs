@@ -78,11 +78,20 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
                         productVM.Product.ImageUrl = Path.Combine(@"\", productPath,fileName).Replace("\\", "/");
                     }
 
+                    if (productVM.Product.Id == null || productVM.Product.Id == 0)
+                    {
+                        //Create
+                        await _productService.CreateProductAsync(productVM.Product);
+                    }
+                    else
+                    {
+                        // update
+                        await _productService.UpdateProductAsync(productVM.Product);
+                    }
                     
 
                 }
-
-                await _productService.CreateProductAsync(productVM.Product);
+               
                 TempData["success"] = "Product created succesfully";
                 return RedirectToAction("Index");
             }

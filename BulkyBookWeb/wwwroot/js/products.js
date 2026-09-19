@@ -1,4 +1,10 @@
-﻿new DataTable('#tblData', {
+﻿var productTable;
+
+$(document).ready(function () {
+    productDataTable();
+});
+
+productDataTable= $('#tblData').DataTable({
     ajax: '/product/getall',
     columns: [
         { data: 'title', "width": "25%" },
@@ -44,6 +50,8 @@ function Delete(url) {
                 url: url,
                 type: 'DELETE',
                     success: function (data) {
+                        productDataTable.ajax.reload();
+
                         Swal.fire({
                             title: "Deleted!",
                             text: "Your file has been deleted.",

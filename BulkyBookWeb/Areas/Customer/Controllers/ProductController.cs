@@ -68,26 +68,28 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
                     if (!Directory.Exists(finalPath))
                     {
                         Directory.CreateDirectory(finalPath);
-                        // save the new image
-
-                        using (var fileStream = new FileStream(Path.Combine(finalPath, fileName), FileMode.Create))
-                        {
-                            file.CopyTo(fileStream);
-                        }
-
-                        productVM.Product.ImageUrl = Path.Combine(@"\", productPath,fileName).Replace("\\", "/");
                     }
-
-                    
+                    // save the new image
+                    using (var fileStream = new FileStream(Path.Combine(finalPath, fileName), FileMode.Create))
+                    {
+                        file.CopyTo(fileStream);
+                    }
+                    productVM.Product.ImageUrl = Path.Combine(@"\", productPath, fileName).Replace("\\", "/");
 
                 }
-
-                await _productService.CreateProductAsync(productVM.Product);
+                if (productVM.Product.Id == null)
+                {
+                    await _productService.CreateProductAsync(productVM.Product);
+                }
+                else
+                {
+                    await _productService.UpdateProductAsync(productVM.Product);
+                }
                 TempData["success"] = "Product created succesfully";
                 return RedirectToAction("Index");
             }
             else
-            { 
+            {
                 var categories = await _categoryService.GetAllcategoriesAsync();
                 productVM = new()
                 {

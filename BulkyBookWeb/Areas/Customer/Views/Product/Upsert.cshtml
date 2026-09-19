@@ -82,10 +82,11 @@
                             </div>
                         </div>
                         <div class="d-flex gap-2 mt-3">
-                            <button type="submit" class="btn btn-accent fw-semibold">@(Model.Product.Id != 0 ? "Edit" : "Create") Product</button>
+@*                             <button type="submit" class="btn btn-accent fw-semibold">@(Model.Product.Id != 0 ? "Edit" : "Create") Product</button> *@
+                            <button type="submit" class="btn btn-accent fw-semibold">Save Product</button>
+
                             <a asp-controller="Product" asp-action="Index" class="btn btn-light fw-medium">Cancel</a>
                         </div>
-
                     </div>
                     <div class="col-lg-4">
                         <!--image-->
@@ -107,11 +108,6 @@
                             </div>
                         }
                     </div>
-                </div>
-
-                <div class="d-flex gap-2 mt-4">
-                    <button type="submit" class="btn btn-accent fw-semibold">Create Product</button>
-                    <a asp-action="Index" class="btn btn-light fw-medium">Cancel</a>
                 </div>
             </form>
         </div>

@@ -17,7 +17,7 @@
                             <a href= "product/upsert?id=${data}" class="btn btn-sm btn-outline-success">
                                 <i class="bi bi-pencil-square"></i>Edit
                             </a>
-                            <a href= "product/delete?id=${data}" class="btn btn-sm btn-outline-danger">
+                            <a onclick="Delete('product/upsert?id=${data}')" class="btn btn-sm btn-outline-danger">
                                 <i class="bi bi-trash-square"></i>Delete
                             </a>
                         </div> `;
@@ -25,3 +25,21 @@
         }
     ]
 });
+
+function Delete() {
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+        if (result.isConfirmed) Swal.fire({
+            title: "Deleted!",
+            text: "Your file has been deleted.",
+            icon: "success"
+        });
+    });
+}

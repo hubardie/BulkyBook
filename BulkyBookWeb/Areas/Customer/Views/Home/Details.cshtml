@@ -6,7 +6,6 @@
         <div class="hidden">@Model.Id</div>
 
         <div class="mb-3">
-            <!-- TODO: Add back link to Index page -->
             <a asp-action="Index" class="text-decoration-none text-secondary small fw-medium d-inline-flex align-items-center gap-1">
                 <i class="bi bi-arrow-left"></i> Back to all books
             </a>
@@ -35,17 +34,12 @@
                     <span class="badge mb-3" style="background: rgba(23,163,74,0.1); color: #17A34A;">
                         <i class="bi bi-bookmark me-1"></i> @Model.Category.Name
                     </span>
-                    <!-- TODO: Display product title -->
                     <h1 class="h3 fw-bold mb-1">@Model.Title</h1>
-                    <!-- TODO: Display author name -->
                     <p class="text-secondary mb-2">by <span class="fw-medium text-dark">John Doe</span></p>
-                    <!-- TODO: Display ISBN -->
                     <p class="text-secondary small mb-4">ISBN: @Model.ISBN</p>
 
                     <div class="d-flex align-items-baseline gap-2 mb-4">
-                        <!-- TODO: Display Price (regular price) -->
                         <span class="h3 fw-bold mb-0" style="color: #17A34A;">@Model.Price.ToString("c")</span>
-                        <!-- TODO: Display ListPrice (strikethrough) -->
                         <span class="text-decoration-line-through text-secondary">@Model.ListPrice.ToString("c")</span>
                     </div>
 
@@ -58,14 +52,12 @@
                             <div class="col-4">
                                 <div class="bg-white border rounded p-2 shadow-sm h-100 d-flex flex-column align-items-center justify-content-center">
                                     <p class="text-uppercase text-secondary mb-1" style="font-size: 0.6rem; font-weight: 700;">1-50 Units</p>
-                                    <!-- TODO: Display Price -->
                                     <p class="fw-bold mb-0" style="color: #17A34A;">@Model.Price.ToString("c")</p>
                                 </div>
                             </div>
                             <div class="col-4">
                                 <div class="bg-white border rounded p-2 shadow-sm h-100 d-flex flex-column align-items-center justify-content-center" style="border-color: rgba(23,163,74,0.3) !important;">
                                     <p class="text-uppercase text-secondary mb-1" style="font-size: 0.6rem; font-weight: 700;">51-100 Units</p>
-                                    <!-- TODO: Display Price50 -->
                                     <p class="fw-bold mb-0" style="color: #17A34A;">@Model.Price50.ToString("c")</p>
                                     <span class="badge mt-1" style="font-size: 0.55rem; background: rgba(23,163,74,0.1); color: #17A34A;">SAVE</span>
                                 </div>
@@ -73,17 +65,15 @@
                             <div class="col-4">
                                 <div class="bg-white border rounded p-2 shadow-sm h-100 d-flex flex-column align-items-center justify-content-center" style="border-color: #17A34A !important;">
                                     <p class="text-uppercase text-secondary mb-1" style="font-size: 0.6rem; font-weight: 700;">100+ Units</p>
-                                    <!-- TODO: Display Price100 -->
-                                    <p class="fw-bold mb-0" style="color: #17A34A;">@Model.Price100.ToString("c")9</p>
+                                    <p class="fw-bold mb-0" style="color: #17A34A;">@Model.Price100.ToString("c")</p>
                                     <span class="badge text-white mt-1" style="font-size: 0.55rem; background: #17A34A;">BEST</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- TODO: Display product description (use Html.Raw for HTML content) -->
                     <div class="text-secondary small mb-4">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                        @Html.Raw(Model.Description)
                     </div>
 
                     <div class="d-flex align-items-center gap-2">

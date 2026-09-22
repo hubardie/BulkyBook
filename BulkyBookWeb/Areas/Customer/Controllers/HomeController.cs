@@ -1,3 +1,4 @@
+using BulkyBook.Business.IServices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BulkyBookWeb.Areas.Customer.Controllers
@@ -5,9 +6,17 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
     [Area("Customer")]
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private readonly IProductService _productService;
+
+        public HomeController(IProductService productService)
         {
-            return View();
+            _productService = productService;
+        }   
+
+        public async Task<IActionResult> Index()
+        {
+            var products = await _productService.GetAllProductsAsync(includeCategory: true);
+            return View(products);
         }
 
         public IActionResult Privacy()

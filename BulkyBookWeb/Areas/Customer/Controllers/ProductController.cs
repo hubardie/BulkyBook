@@ -68,35 +68,28 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
                     if (!Directory.Exists(finalPath))
                     {
                         Directory.CreateDirectory(finalPath);
-                        // save the new image
-
-                        using (var fileStream = new FileStream(Path.Combine(finalPath, fileName), FileMode.Create))
-                        {
-                            file.CopyTo(fileStream);
-                        }
-
-                        productVM.Product.ImageUrl = Path.Combine(@"\", productPath,fileName).Replace("\\", "/");
                     }
-
-                    if (productVM.Product.Id == null || productVM.Product.Id == 0)
+                    // save the new image
+                    using (var fileStream = new FileStream(Path.Combine(finalPath, fileName), FileMode.Create))
                     {
-                        //Create
-                        await _productService.CreateProductAsync(productVM.Product);
+                        file.CopyTo(fileStream);
                     }
-                    else
-                    {
-                        // update
-                        await _productService.UpdateProductAsync(productVM.Product);
-                    }
-                    
+                    productVM.Product.ImageUrl = Path.Combine(@"\", productPath, fileName).Replace("\\", "/");
 
                 }
-               
+                if (productVM.Product.Id == null)
+                {
+                    await _productService.CreateProductAsync(productVM.Product);
+                }
+                else
+                {
+                    await _productService.UpdateProductAsync(productVM.Product);
+                }
                 TempData["success"] = "Product created succesfully";
                 return RedirectToAction("Index");
             }
             else
-            { 
+            {
                 var categories = await _categoryService.GetAllcategoriesAsync();
                 productVM = new()
                 {
@@ -109,40 +102,44 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
                 };
                 return View(productVM);
             }
-        }
-
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null && id == 0)
-            {
-                return NotFound();
-            }
-
-            var product = await _productService.GetProductByIdASync(id.Value);
-
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            return View(product);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken] // Validates that the request comes from the webpage
-        [ActionName("Delete")]
-        public async Task<IActionResult> DeletePOST(int? Id)
-        {
-            await _productService.DeleteProductAsync(Id.Value);
-            TempData["success"] = "Product deleted succesfully";
-            return RedirectToAction(nameof(Index));
-        }
+        } 
 
         #region "API CALLS"
         public async Task<IActionResult> GetAll()
         {
             var products = await _productService.GetAllProductsAsync(true);
             return Json(new { data = products });
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete(int? Id)
+        {
+            if (Id == null || Id == 0)
+            {
+                return Json(new { successs = false, message = "Invalid ID" });
+            }
+
+            var productToDelete = await _productService.GetProductByIdASync(Id.Value);
+            if (productToDelete == null)
+            {
+                return Json(new { successs = false, message = "Product does not exist in database. Error deleting" });
+            }
+            // First we check if image exists and delete it
+
+            if (!string.IsNullOrEmpty(productToDelete.ImageUrl))
+            {
+                var imagePath = Path.Combine(_webHostEnvironment.WebRootPath, productToDelete.ImageUrl.TrimStart('\\','/'));
+                if (System.IO.File.Exists(imagePath))
+                {
+                    System.IO.File.Delete(imagePath);
+                }
+
+            }
+
+            await _productService.DeleteProductAsync(Id.Value);
+
+            return Json(new { successs = true, message = "Product deleted" });
+
         }
         #endregion
     }

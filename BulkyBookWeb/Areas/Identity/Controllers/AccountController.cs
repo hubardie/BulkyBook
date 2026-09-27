@@ -1,7 +1,9 @@
 ﻿using BulkyBook.Models;
 using BulkyBook.Models.ViewModels;
+using BulkyBook.Utility;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 
 namespace BulkyBookWeb.Areas.Identity.Controllers
@@ -11,10 +13,13 @@ namespace BulkyBookWeb.Areas.Identity.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        private readonly RoleManager<IdentityRole> _roleManager;
+
+        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager)
         {
-            _userManager = userManager;
+            _userManager = userManager; 
             _signInManager = signInManager;
+            _roleManager = roleManager;
         }
 
         public IActionResult Login()
@@ -44,12 +49,29 @@ namespace BulkyBookWeb.Areas.Identity.Controllers
         }
         public IActionResult Register()
         {
-            return View();
+            var model = new RegisterVM
+            {
+                RoleList = new List<SelectListItem>
+                {
+                    new SelectListItem { Text = SD.RoleAdmin, Value =  SD.RoleAdmin },
+                    new SelectListItem { Text = SD.RoleCustomer, Value =  SD.RoleCustomer },
+                    new SelectListItem { Text = SD.RoleEmployee, Value =  SD.RoleEmployee },
+                }
+            };
+            return View(model);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterVM registerVM)
         {
+            if (!await _roleManager.RoleExistsAsync(SD.RoleAdmin))
+            {
+                await _roleManager.CreateAsync(new IdentityRole(SD.RoleAdmin)); 
+                await _roleManager.CreateAsync(new IdentityRole(SD.RoleEmployee));
+                await _roleManager.CreateAsync(new IdentityRole(SD.RoleCustomer));
+            }
+
+
             if (ModelState.IsValid) {
                 var user = new ApplicationUser
                 {
@@ -66,6 +88,12 @@ namespace BulkyBookWeb.Areas.Identity.Controllers
                 var result = await _userManager.CreateAsync(user, password: registerVM.Password);
                 if (result.Succeeded)
                 {
+                    if (string.IsNullOrEmpty(registerVM.Role))
+                    {
+                        registerVM.Role = SD.RoleCustomer;
+                    }
+                    await _userManager.AddToRoleAsync(user, registerVM.Role);
+
                     // user has been created
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     return RedirectToAction("Index", "Home", new { area = "Customer" });

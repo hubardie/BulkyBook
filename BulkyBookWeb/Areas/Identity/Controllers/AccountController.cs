@@ -26,6 +26,20 @@ namespace BulkyBookWeb.Areas.Identity.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginVM loginVM)
         {
+            if (ModelState.IsValid)
+            {
+                var result = await _signInManager.PasswordSignInAsync(loginVM.Email, loginVM.Password, loginVM.RememberMe, lockoutOnFailure: false);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("Index", "Home", new { area = "Customer" });
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid login attemp.");                
+                }
+            }
+           
+ 
             return View();
         }
         public IActionResult Register()

@@ -1,8 +1,13 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
 @if (SignInManager.IsSignedIn(User))
 {
     <form method="post" asp-area="Identity" asp-controller="Account" asp-action="Logout">
+        <a class="text-white-50 text-decoration-none small fw-medium">
+             <i class="bi bi-person-circle me-1"></i>@UserManager.GetUserName(User)
+        </a>
         <button type="submit" class="btn btn-sm btn-outline-light" style="font-size: 0.7rem; letter-spacing: 0.05em; text-transform: uppercase;">Logout</button>
     </form>
 }

@@ -1,4 +1,5 @@
-﻿<div class="container">
+﻿@model RegisterVM
+<div class="container">
     <div class="row justify-content-center mt-5 mb-5">
         <div class="col-md-8 col-lg-7">
             <div class="card shadow-sm border overflow-hidden">
@@ -9,66 +10,71 @@
                 </div>
 
                 <div class="card-body p-5">
-                    <form>
-                        <!-- TODO: Add validation summary for ModelOnly errors with class "text-danger mb-3" -->
-
+                    <form method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <!-- TODO: Add label, input and validation tag helper for Name property -->
-                                <label>Name</label>
-                                <input type="text" class="form-control" placeholder="John Doe" />
+                                <label asp-for="Name">Name</label>
+                                <input asp-for="Name" type="text" class="form-control" placeholder="John Doe" />
+                                <span asp-validation-for="Name" class="text-danger mb-3"></span>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <!-- TODO: Add label, input and validation tag helper for Email property -->
-                                <label>Email</label>
-                                <input type="email" class="form-control" placeholder="name@example.com" />
+                                <label asp-for="Email">Email</label>
+                                <input asp-for="Email" type="email" class="form-control" placeholder="name@example.com" />
+                                <span asp-validation-for="Email" class="text-danger mb-3"></span>
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <!-- TODO: Add label, input and validation tag helper for Password property -->
-                                <label>Password</label>
-                                <input type="password" class="form-control" placeholder="••••••••" />
+                                <label asp-for="Password">Password</label>
+                                <input asp-for="Password" type="password" class="form-control" placeholder="••••••••" />
+                                <span asp-validation-for="Password" class="text-danger mb-3"></span>
+
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <!-- TODO: Add label, input and validation tag helper for ConfirmPassword property -->
-                                <label>Confirm Password</label>
-                                <input type="password" class="form-control" placeholder="••••••••" />
+                                <label asp-for="ConfirmPassword">Confirm Password</label>
+                                <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="••••••••" />
+                                <span asp-validation-for="ConfirmPassword" class="text-danger mb-3"></span>
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <!-- TODO: Add label, input and validation tag helper for PhoneNumber property -->
-                            <label>Phone Number</label>
-                            <input type="text" class="form-control" placeholder="(123) 456-7890" />
+                            <label asp-for="PhoneNumber">Phone Number</label>
+                            <input asp-for="PhoneNumber" type="text" class="form-control" placeholder="(123) 456-7890" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger mb-3"></span>
+
                         </div>
 
                         <div class="mb-3">
-                            <!-- TODO: Add label, input and validation tag helper for StreetAddress property -->
-                            <label>Street Address</label>
-                            <input type="text" class="form-control" placeholder="123 Main St" />
+                            <label asp-for="StreetAddress">Street Address</label>
+                            <input asp-for="StreetAddress" type="text" class="form-control" placeholder="123 Main St" />
+                            <span asp-validation-for="StreetAddress" class="text-danger mb-3"></span>
+
                         </div>
 
                         <div class="row">
                             <div class="col-md-5 mb-3">
-                                <!-- TODO: Add label, input and validation tag helper for City property -->
-                                <label>City</label>
-                                <input type="text" class="form-control" placeholder="New York" />
+                                <label asp-for="City">City</label>
+                                <input asp-for="City" type="text" class="form-control" placeholder="New York" />
+                                <span asp-validation-for="City" class="text-danger mb-3"></span>
                             </div>
 
                             <div class="col-md-4 mb-3">
                                 <!-- TODO: Add label, input and validation tag helper for State property -->
-                                <label>State</label>
-                                <input type="text" class="form-control" placeholder="NY" />
+                                <label asp-for="State">State</label>
+                                <input asp-for="State" type ="text" class="form-control" placeholder="NY" />
+                                <span asp-validation-for="State" class="text-danger mb-3"></span>
                             </div>
 
                             <div class="col-md-3 mb-3">
                                 <!-- TODO: Add label, input and validation tag helper for PostalCode property -->
-                                <label>Postal Code</label>
-                                <input type="text" class="form-control" placeholder="10001" />
+                                <label asp-for="PostalCode">Postal Code</label>
+                                <input asp-for="PostalCode" type="text" class="form-control" placeholder="10001" />
+                                <span asp-validation-for="PostalCode" class="text-danger mb-3"></span>
                             </div>
                         </div>
 
@@ -88,3 +94,6 @@
         </div>
     </div>
 </div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,9 +1,8 @@
 ﻿using BulkyBook.Models;
 using BulkyBook.Models.ViewModels;
-using BulkyBookWeb.Areas.Customer.Controllers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Client;
+
 
 namespace BulkyBookWeb.Areas.Identity.Controllers
 {
@@ -12,7 +11,7 @@ namespace BulkyBookWeb.Areas.Identity.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        public AccountController(UserManager userManager, SignInManager signInManager)
+        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -50,7 +49,7 @@ namespace BulkyBookWeb.Areas.Identity.Controllers
                     PostalCode = registerVM.PostalCode
                 };
 
-                var result = await _userManager.CreateAsync(user);
+                var result = await _userManager.CreateAsync(user, password: registerVM.Password);
                 if (result.Succeeded)
                 {
                     // user has been created
@@ -69,6 +68,11 @@ namespace BulkyBookWeb.Areas.Identity.Controllers
         public IActionResult AccessDenied()
         {
             return View();
+        }
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home", new { area = "Customer" });
         }
     }
 }

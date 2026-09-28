@@ -40,7 +40,7 @@ namespace BulkyBookWeb.Areas.Identity.Controllers
                     // Redirect to returnUrl if valid, Home otherwise
                     if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                     {
-                        return LocalRedirect(returnUrl);
+                        return Redirect(returnUrl);
                     }
                     return RedirectToAction("Index", "Home", new { area = "Customer" });
                 }
@@ -108,7 +108,7 @@ namespace BulkyBookWeb.Areas.Identity.Controllers
 
                     if (!string.IsNullOrEmpty(returnUrl))
                     {
-                        return RedirectToAction(returnUrl);
+                        return Redirect(returnUrl);
                     }
                     return RedirectToAction("Index", "Home", new { area = "Customer" });
                 }

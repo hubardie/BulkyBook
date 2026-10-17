@@ -6,7 +6,7 @@ namespace BulkyBook.Business.IServices
     {
         Task<ShoppingCart?> GetShoppingCartByIdAsync(int cartId);
 
-        Task<IEnumerable<ShoppingCart>> GetShoppingCartItemsAsync(string userId);
+        Task<IEnumerable<ShoppingCart>> GetUserShoppingCartItemsAsync(string userId);
         Task<int> GetCartCountAsync(string userId);
         Task<ShoppingCart> AddToCartAsync(ShoppingCart cart);
         Task UpdateCartAsync(ShoppingCart cart);

@@ -20,7 +20,6 @@ namespace BulkyBook.Business.Services
                 _context.ShoppingCarts.RemoveRange(cartItems);
                 await _context.SaveChangesAsync();
             }
-
         }
 
         public async Task<int> GetCartCountAsync(string userId)
@@ -37,13 +36,38 @@ namespace BulkyBook.Business.Services
         {
             return await _context.ShoppingCarts.Include(p => p.Product).Where(u => u.ApplicationUserId == userId).ToListAsync();
         }
-        public Task<ShoppingCart> AddToCartAsync(ShoppingCart cart)
+        public async Task<ShoppingCart> AddToCartAsync(ShoppingCart cart)
         {
-            throw new NotImplementedException();
+            var existingCart = await _context.ShoppingCarts.Include(p => p.Product)
+                .FirstOrDefaultAsync(c => c.ApplicationUserId == cart.ApplicationUserId && c.ProductId == cart.ProductId);
+
+            if(existingCart != null)
+            {
+                existingCart.Count += cart.Count;              
+            }
+            else
+            {
+                existingCart = cart;
+                await _context.ShoppingCarts.AddAsync(cart);
+            }
+            await _context.SaveChangesAsync();
+
+
+            return existingCart;
+
         }
-        public Task UpdateCartAsync(ShoppingCart cart)
+        public async Task UpdateCartAsync(ShoppingCart cart)
         {
-            throw new NotImplementedException();
+            if (cart.Count <= 0)            
+            { 
+                _context.ShoppingCarts.Remove(cart);
+            }
+            else
+            {
+                _context.ShoppingCarts.Update(cart);
+            }
+            await _context.SaveChangesAsync();
+
         }
     }
 }

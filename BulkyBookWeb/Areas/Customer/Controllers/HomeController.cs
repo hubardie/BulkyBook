@@ -57,7 +57,7 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
 
             await _shoppingCartService.AddToCartAsync(shoppingCart);
           
-            return RedirectToAction("Details", new { productId = shoppingCart.ProductId});
+            return RedirectToAction(nameof(Details), new { productId = shoppingCart.ProductId});
         }
 
     }

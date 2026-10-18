@@ -36,7 +36,7 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
             {             
                 await _categoryService.CreateCategoryAsync(category);
                 TempData["success"] = "Category created succesfully";
-                return RedirectToAction("Index");
+                return RedirectToAction(nameof(Index));
             }
             return View();
         }
@@ -71,7 +71,7 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
             {
                 await _categoryService.UpdateCategoryAsync(category);
                 TempData["success"] = "Category updated succesfully";
-                return RedirectToAction("Index");
+                return RedirectToAction(nameof(Index));
             }
             return View();
         }

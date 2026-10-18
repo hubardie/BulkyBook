@@ -11,5 +11,7 @@ namespace BulkyBook.Utility
         public const string RoleAdmin = "Admin";
         public const string RoleEmployee = "Employee";
 
+        public const string SessionCart = "SessionShoppingCartBulkyBook";
+
     }
 }

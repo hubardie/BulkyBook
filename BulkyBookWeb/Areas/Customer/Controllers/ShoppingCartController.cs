@@ -1,5 +1,6 @@
 using BulkyBook.Business.IServices;
 using BulkyBook.Models.ViewModels;
+using BulkyBook.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -55,5 +56,81 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             }
             return View(cartVM);
         }
+
+        public async Task<IActionResult> Plus(int cartId)
+        {
+            var cart = await _shoppingCartService.GetShoppingCartByIdAsync(cartId);
+            if (cart != null)
+            {
+                cart.Count++;
+                await _shoppingCartService.UpdateCartAsync(cart);            
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Minus(int cartId)
+        {
+            var cart = await _shoppingCartService.GetShoppingCartByIdAsync(cartId);
+            if (cart != null && cart?.Count>0)
+            {
+                cart.Count--;
+                await _shoppingCartService.UpdateCartAsync(cart);
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Remove(int cartId)
+        {
+            var cart = await _shoppingCartService.GetShoppingCartByIdAsync(cartId);
+            if (cart != null)
+            {
+                cart.Count = 0;
+                await _shoppingCartService.UpdateCartAsync(cart);
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> UpdateCart(int cartId, int count)
+        {
+            var cart = await _shoppingCartService.GetShoppingCartByIdAsync(cartId);
+            if (cart == null)
+            {
+                return NotFound();
+            }
+
+
+            if (count <= 1)
+            {
+                cart.Count = 0;
+            }
+            else
+            {
+                if (count >= 1000)
+                {
+                    cart.Count = 1000;
+                }
+                else
+                {
+                    cart.Count = count;
+                }
+            }
+            await _shoppingCartService.UpdateCartAsync(cart);
+            await UpdateCartSessionAsync();
+            return Ok(new { success = true });
+        }
+
+        private async Task UpdateCartSessionAsync()
+        {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!string.IsNullOrEmpty(userId))
+            {
+                var count = await _shoppingCartService.GetCartCountAsync(userId);
+                HttpContext.Session.SetInt32(SD.SessionCart, count);
+            }
+        }
+
     }
 }
+ 

@@ -52,16 +52,16 @@
                                         <a href="#" class="fw-semibold text-decoration-none d-block text-truncate" style="font-size: 0.85rem;">
                                             @item.Product.Title
                                         </a>
-                                        <p class="text-secondary mb-2" style="font-size: 0.7rem;">by @item.Product.Author &middot; @item.Product.Price.ToString("c") each</p>
+                                        <p class="text-secondary mb-2" style="font-size: 0.7rem;">by @item.Product.Author &middot; @item.Price.ToString("c") each</p>
 
                                         <div class="d-flex align-items-center gap-2">
                                             <div class="input-group" style="width: 130px;">
-                                                <a href="#" class="btn btn-outline-secondary btn-sm px-2"><i class="bi bi-dash"></i></a>
+                                                <a asp-controller="ShoppingCart" asp-action="Minus" asp-route-cartId="@item.Id" class="btn btn-outline-secondary btn-sm px-2"><i class="bi bi-dash"></i></a>
                                                 <input type="number" value="@item.Count" min="1"
                                                        class="form-control form-control-sm text-center fw-bold"
                                                        style="min-width: 52px;"
                                                        onchange="updateCart(1, this.value)" />
-                                                <a href="#" class="btn btn-outline-success btn-sm px-2"><i class="bi bi-plus-lg"></i></a>
+                                                <a asp-controller="ShoppingCart" asp-action="Plus" asp-route-cartId="@item.Id" class="btn btn-outline-success btn-sm px-2"><i class="bi bi-plus-lg"></i></a>
                                             </div>
                                         </div>
                                     </div>
@@ -69,7 +69,7 @@
                                     <!-- Price + Remove -->
                                     <div class="text-end flex-shrink-0 d-flex flex-column justify-content-between align-self-stretch">
                                         <span class="fw-bold" style="font-size: 0.9rem;">@((item.Price * item.Count).ToString("c"))</span>
-                                        <a href="#" class="text-danger text-decoration-none d-inline-flex align-items-center gap-1" style="font-size: 0.7rem;">
+                                        <a asp-controller="ShoppingCart" asp-action="Remove" asp-route-cartId="@item.Id" class="text-danger text-decoration-none d-inline-flex align-items-center gap-1" style="font-size: 0.7rem;">
                                             <i class="bi bi-trash3"></i> Remove
                                         </a>
                                     </div>
@@ -92,7 +92,7 @@
                         <!-- Shipping -->
                         <div class="px-4 pt-4 pb-3">
                             <h6 class="fw-bold mb-3 d-flex align-items-center gap-2">
-                                <i class="bi bi-geo-alt" style="color: #17A34A;"></i> Shipping Address
+                                <i class="bi bi-file-person" style="color: #17A34A;"></i> Name and Phone
                             </h6>
                             <div class="row g-2 mb-2">
                                 <div class="col-6">
@@ -104,6 +104,9 @@
                                     <span asp-validation-for="OrderHeader.PhoneNumber" class="text-danger" style="font-size: 0.65rem;"></span>
                                 </div>
                             </div>
+                            <h6 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                                <i class="bi bi-geo-alt" style="color: #17A34A;"></i> Shipping Address
+                            </h6>
                             <div class="mb-2">
                                 <input asp-for="OrderHeader.StreetAddress" class="form-control form-control-sm" placeholder="Street Address" />
                                 <span asp-validation-for="OrderHeader.StreetAddress" class="text-danger" style="font-size: 0.65rem;"></span>
@@ -168,4 +171,22 @@
         </div>
     </form>
 </div>
+
+@section Scripts {
+
+    <script>
+        function updateCart(cartId, count){
+            fetch('/Customer/ShoppingCart/UpdateCart',{
+                method:'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body:'cartId='+cartId + '&count=' + count
+            }).then(response=>{
+                if(response.ok) window.location.reload();
+            });
+        console.log('ggg');
+        }
+    </script>
+
+    <partial name="_ValidationScriptsPartial" />
+}
 

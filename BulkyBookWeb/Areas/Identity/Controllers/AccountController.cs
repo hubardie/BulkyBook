@@ -1,6 +1,7 @@
 ﻿using BulkyBook.Models;
 using BulkyBook.Models.ViewModels;
 using BulkyBook.Utility;
+using BulkyBookWeb.Areas.Customer.Controllers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -42,7 +43,7 @@ namespace BulkyBookWeb.Areas.Identity.Controllers
                     {
                         return Redirect(returnUrl);
                     }
-                    return RedirectToAction("Index", "Home", new { area = "Customer" });
+                    return RedirectToAction(nameof(Index), "Home", new { area = "Customer" });
                 }
                 else
                 {
@@ -110,7 +111,7 @@ namespace BulkyBookWeb.Areas.Identity.Controllers
                     {
                         return Redirect(returnUrl);
                     }
-                    return RedirectToAction("Index", "Home", new { area = "Customer" });
+                    return RedirectToAction(nameof(Index), "Home", new { area = "Customer" });
                 }
 
                 foreach (var error in result.Errors)
@@ -128,7 +129,7 @@ namespace BulkyBookWeb.Areas.Identity.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Home", new { area = "Customer" });
+            return RedirectToAction(nameof(Index), "Home", new { area = "Customer" });
         }
     }
 }

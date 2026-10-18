@@ -91,7 +91,7 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
                     await _productService.UpdateProductAsync(productVM.Product);
                 }
                 TempData["success"] = "Product created succesfully";
-                return RedirectToAction("Index");
+                return RedirectToAction(nameof(Index));
             }
             else
             {

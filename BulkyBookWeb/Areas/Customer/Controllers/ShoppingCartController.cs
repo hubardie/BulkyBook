@@ -62,8 +62,11 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             var cart = await _shoppingCartService.GetShoppingCartByIdAsync(cartId);
             if (cart != null)
             {
-                cart.Count++;
-                await _shoppingCartService.UpdateCartAsync(cart);            
+                if(cart.Count < 1000)
+                {
+                    cart.Count++;
+                    await _shoppingCartService.UpdateCartAsync(cart);
+                }
             }
             return RedirectToAction(nameof(Index));
         }

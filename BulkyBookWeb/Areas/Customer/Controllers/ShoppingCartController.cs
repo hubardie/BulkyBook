@@ -10,14 +10,14 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
     [Authorize]
     public class ShoppingCartController : Controller
     {
-        private readonly IProductService _productService;
         private readonly IShoppingCartService _shoppingCartService;
+        private readonly IApplicationUserService _applicationUserService;
 
 
-        public ShoppingCartController(IProductService productService, IShoppingCartService shoppingCartService)
+        public ShoppingCartController(IShoppingCartService shoppingCartService, IApplicationUserService applicationUserService)
         {
-            _productService = productService;
             _shoppingCartService = shoppingCartService;
+            _applicationUserService = applicationUserService;
         }
 
         public async Task<IActionResult> Index()
@@ -31,11 +31,22 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             }
 
             var cartItems = await _shoppingCartService.GetUserShoppingCartItemsAsync(userId);
+            var user = await _applicationUserService.GetUserByIdAsync(userId);
 
             ShoppingCartVM cartVM = new()
             {
                 ShoppingCartList = cartItems,
                 OrderHeader = new()
+                {
+                    ApplicationUser = user,
+                    ApplicationUserId = userId,
+                    Name = user.Name,
+                    PhoneNumber = user.PhoneNumber,
+                    StreetAddress = user.StreetAddress,
+                    City = user.City,
+                    State = user.State,
+                    PostalCode = user.PostalCode
+                }
             };
             foreach (var cart in cartVM.ShoppingCartList)
             {

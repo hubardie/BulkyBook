@@ -8,6 +8,10 @@ namespace BulkyBook.Business.Services
     public class CategoryService : ICategoryService
     {
         private readonly ApplicationDbContext _context;
+        public CategoryService(ApplicationDbContext context)
+        {
+            _context = context;
+        }
         public async Task<IEnumerable<Category>> GetAllcategoriesAsync()
         {
             return await _context.Categories.ToListAsync();
@@ -16,11 +20,6 @@ namespace BulkyBook.Business.Services
         {
             return await _context.Categories.FindAsync(id); 
         }
-        public CategoryService(ApplicationDbContext context)
-        {
-            _context = context;
-        }
-
         public  async Task<Category> CreateCategoryAsync(Category category)
         {
             _context.Add(category);

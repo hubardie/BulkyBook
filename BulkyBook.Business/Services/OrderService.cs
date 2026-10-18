@@ -2,9 +2,6 @@
 using BulkyBook.DataAccess.Data;
 using BulkyBook.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace BulkyBook.Business.Services
 {
@@ -17,9 +14,11 @@ namespace BulkyBook.Business.Services
             _context = context;
         }
 
-        public Task<OrderHeader> CreateOrderAsync(OrderHeader orderHeader)
+        public async Task<OrderHeader> CreateOrderAsync(OrderHeader orderHeader)
         {
-            throw new NotImplementedException();
+            _context.OrderHeaders.Add(orderHeader);
+            await _context.SaveChangesAsync();
+            return orderHeader;
         }
 
         public async Task<IEnumerable<OrderHeader>> GetAllOrdersAsync(string? userId = null, string? status = null, bool includeUser = false, bool includeDetails = false)
@@ -58,6 +57,11 @@ namespace BulkyBook.Business.Services
 
             return await query.FirstOrDefaultAsync(u => u.Id == id);
 
+        }
+
+        Task<OrderHeader> IOrderService.GetAllOrdersAsync(string? userId, string? status, bool includeUser, bool includeDetails)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -90,10 +90,10 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
                 Price = cart.Price,
                 Count = cart.Count,
                 Product = cart.Product
-            });
+            }).ToList();
             // Create order
             await _orderService.CreateOrderAsync(shopppingCartVM.OrderHeader);
-            RedirectToAction(nameof(OrderConfirmation), new { id = shopppingCartVM.OrderHeader.Id});
+            return RedirectToAction(nameof(OrderConfirmation), new { orderHeaderId = shopppingCartVM.OrderHeader.Id});
 
         }
 

@@ -1,4 +1,5 @@
 using BulkyBook.Business.IServices;
+using BulkyBook.Models;
 using BulkyBook.Models.ViewModels;
 using BulkyBook.Utility;
 using Microsoft.AspNetCore.Authorization;
@@ -13,12 +14,14 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
     {
         private readonly IShoppingCartService _shoppingCartService;
         private readonly IApplicationUserService _applicationUserService;
+        private readonly IOrderService _orderService;
 
 
-        public ShoppingCartController(IShoppingCartService shoppingCartService, IApplicationUserService applicationUserService)
+        public ShoppingCartController(IShoppingCartService shoppingCartService, IApplicationUserService applicationUserService, IOrderService orderService  )
         {
             _shoppingCartService = shoppingCartService;
             _applicationUserService = applicationUserService;
+            _orderService = orderService;
         }
 
         public async Task<IActionResult> Index()
@@ -80,9 +83,23 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             {
                 shopppingCartVM.OrderHeader.OrderTotal += (cart.Price * cart.Count);
             }
-            shopppingCartVM.OrderHeader.OrderStatus = SD.StatusPending;
+            shopppingCartVM.OrderHeader.OrderStatus = SD.StatusApproved;
+            shopppingCartVM.OrderHeader.OrderDetails = shopppingCartVM.ShoppingCartList.Select(cart => new OrderDetails
+            {
+                ProductId = cart.ProductId,
+                Price = cart.Price,
+                Count = cart.Count,
+                Product = cart.Product
+            });
             // Create order
-            return View(shopppingCartVM);
+            await _orderService.CreateOrderAsync(shopppingCartVM.OrderHeader);
+            RedirectToAction(nameof(OrderConfirmation), new { id = shopppingCartVM.OrderHeader.Id});
+
+        }
+
+        public async Task<IActionResult> OrderConfirmation(int orderHeaderId)
+        {
+            return View(orderHeaderId);
         }
 
         public async Task<IActionResult> Plus(int cartId)

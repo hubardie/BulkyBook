@@ -56,7 +56,7 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             shoppingCart.ApplicationUserId = userId;
 
             await _shoppingCartService.AddToCartAsync(shoppingCart);
-          
+            TempData["success"] = "Item added to cart";          
             return RedirectToAction(nameof(Details), new { productId = shoppingCart.ProductId});
         }
 

@@ -56,6 +56,34 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             }
             return View(cartVM);
         }
+        [HttpPost]
+        [ActionName("Index")]
+        public async Task<IActionResult> IndexPOST(ShoppingCartVM shopppingCartVM)
+        {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            var cartItems = await _shoppingCartService.GetUserShoppingCartItemsAsync(userId);
+
+            shopppingCartVM.ShoppingCartList = cartItems;
+            shopppingCartVM.OrderHeader.OrderDate = DateTime.UtcNow;
+            shopppingCartVM.OrderHeader.ApplicationUserId = userId;
+
+
+
+            foreach (var cart in shopppingCartVM.ShoppingCartList)
+            {
+                shopppingCartVM.OrderHeader.OrderTotal += (cart.Price * cart.Count);
+            }
+            shopppingCartVM.OrderHeader.OrderStatus = SD.StatusPending;
+            // Create order
+            return View(shopppingCartVM);
+        }
 
         public async Task<IActionResult> Plus(int cartId)
         {

@@ -11,6 +11,13 @@ namespace BulkyBook.Utility
         public const string RoleAdmin = "Admin";
         public const string RoleEmployee = "Employee";
 
+        public const string StatusPending = "Pending";
+        public const string StatusApproved = "Approved";
+        public const string StatusProcessing = "Processing";
+        public const string StatusShipped = "Shipped";
+        public const string StatusCancelled = "Cancelled";
+        public const string StatusRefunded = "Refunded";
+
         public const string SessionCart = "SessionShoppingCartBulkyBook";
 
     }

@@ -59,9 +59,5 @@ namespace BulkyBook.Business.Services
 
         }
 
-        Task<OrderHeader> IOrderService.GetAllOrdersAsync(string? userId, string? status, bool includeUser, bool includeDetails)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

@@ -1,16 +1,34 @@
-﻿let orderDataTable;
+﻿var dataTable;
 
 $(document).ready(function () {
-    orderDataTable = $('#tblData').DataTable({
-        ajax: '/admin/order/getall', /* Si el área no está definida, parte del área por defecto */
+
+    var url = window.location.search;
+    if (url.includes("cancelled")) {
+        loadDataTable("cancelled");
+    } else if (url.includes("pending")) {
+        loadDataTable("pending");
+    } else if (url.includes("approved")) {
+        loadDataTable("approved");
+    } else if (url.includes("inprocess")) {
+        loadDataTable("inprocess");
+    } else if (url.includes("completed")) {
+        loadDataTable("completed");
+    } else {
+        loadDataTable("all");
+    }
+})
+
+function loadDataTable(status) {
+
+    dataTable = $('#tblData').DataTable({
+        ajax: '/admin/order/getall?status' + status, 
         columns: [
             { data: 'id', "width": "5%" },
             { data: 'name', "width": "20%" },
             { data: 'phoneNumber', "width": "15%" },
             { data: 'applicationUser.email', "width": "20%" },
             {
-                data: 'orderStatus', "width": "15%", "render": function (data)
-                {
+                data: 'orderStatus', "width": "15%", "render": function (data) {
                     var bg = '#f1f5f9', fg = '#475569';
                     if (data === 'Approved') { bg = '#d1fae5'; fg = '#047857'; } /* Status must match SD statuses */
                     else if (data === 'Processing') { bg = '#fef3c7'; fg = '#b45309'; }
@@ -33,6 +51,5 @@ $(document).ready(function () {
             }
         ]
     });
-});
 
- 
+}

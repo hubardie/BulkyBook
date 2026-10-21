@@ -9,10 +9,10 @@ $(document).ready(function () {
         loadDataTable("pending");
     } else if (url.includes("approved")) {
         loadDataTable("approved");
-    } else if (url.includes("inprocess")) {
-        loadDataTable("inprocess");
-    } else if (url.includes("completed")) {
-        loadDataTable("completed");
+    } else if (url.includes("processing")) {
+        loadDataTable("processing");
+    } else if (url.includes("shipped")) {
+        loadDataTable("shipped");
     } else {
         loadDataTable("all");
     }
@@ -21,7 +21,7 @@ $(document).ready(function () {
 function loadDataTable(status) {
 
     dataTable = $('#tblData').DataTable({
-        ajax: '/admin/order/getall?status' + status, 
+        ajax: '/admin/order/getall?status=' + status, 
         columns: [
             { data: 'id', "width": "5%" },
             { data: 'name', "width": "20%" },

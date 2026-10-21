@@ -46,8 +46,7 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
 
                 if (string.IsNullOrEmpty(userId))
                 {
-                    return Unauthorized();
-                
+                    return Unauthorized();                
                 }
             }
 

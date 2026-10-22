@@ -23,8 +23,8 @@
 
     }
 
-    var isCustomer = !User.IsInRole(SD.RoleCustomer);
-    var containerClass = isCustomer ? "container my-4" : "container-fluid py-4";
+    var isCustomer = User.IsInRole(SD.RoleCustomer);
+    var containerClass = isCustomer ? "container my-4 pt-3" : "container-fluid py-4";
 
 }
 

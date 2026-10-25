@@ -1,6 +1,7 @@
 ﻿using BulkyBook.Business.IServices;
 using BulkyBook.DataAccess.Data;
 using BulkyBook.Models;
+using BulkyBook.Utility;
 using Microsoft.EntityFrameworkCore;
 
 namespace BulkyBook.Business.Services
@@ -62,6 +63,32 @@ namespace BulkyBook.Business.Services
         public async Task UpdateOrderAsync(OrderHeader ordeHeader)
         {
             _context.OrderHeaders.Update(ordeHeader);
+            await _context.SaveChangesAsync();
+
+        }
+
+        public async Task UpdateOrderStatus(int id, string orderStatus, string? carrier = null, string? trackingNumber = null)
+        {
+            var orderHeaderFromDb = await _context.OrderHeaders.FirstOrDefaultAsync(u => u.Id == id);
+            if (orderHeaderFromDb == null)
+            {
+                throw new KeyNotFoundException($"Order with id {id} not found");
+            }
+            orderHeaderFromDb.OrderStatus = orderStatus;
+            if (orderHeaderFromDb.OrderStatus == SD.StatusShipped)
+            {
+                orderHeaderFromDb.ShippingDate = DateTime.UtcNow;
+                if (!string.IsNullOrEmpty(carrier))
+                {
+                    orderHeaderFromDb.Carrier = carrier;
+                }
+                if (!string.IsNullOrEmpty(trackingNumber))
+                {
+                    orderHeaderFromDb.TrackingNumber = trackingNumber;
+                }
+                orderHeaderFromDb.OrderStatus = SD.StatusShipped;
+            }
+
             await _context.SaveChangesAsync();
 
         }

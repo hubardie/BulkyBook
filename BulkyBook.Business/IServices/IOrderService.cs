@@ -8,7 +8,9 @@ namespace BulkyBook.Business.IServices
         Task<OrderHeader> CreateOrderAsync(OrderHeader orderHeader);
         Task<OrderHeader> GetOrderByIdAsync(int id, bool includeUser = false, bool includeDetails = false);
 
-        Task<IEnumerable<OrderHeader>> GetAllOrdersAsync(string? userId = null, string? status = null, bool includeUser = false, bool includeDetails = false); 
+        Task<IEnumerable<OrderHeader>> GetAllOrdersAsync(string? userId = null, string? status = null, bool includeUser = false, bool includeDetails = false);
+
+        Task UpdateOrderAsync(OrderHeader orderHeader);
 
     }
 }

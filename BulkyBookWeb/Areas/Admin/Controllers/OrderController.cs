@@ -32,6 +32,33 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
             OrderHeader = await _orderService.GetOrderByIdAsync(orderId, includeUser: true, includeDetails: true);
             return View(OrderHeader);
         }
+        [HttpPost]
+        [Authorize(Roles = SD.RoleAdmin + "," + SD.RoleEmployee)] // Employee and admin can update order status
+        public async Task<IActionResult> UpdateOrderDetails() // OrderHeader not required because it is already bound to the property
+        {
+            // Mapeamos manualmente los campos que queremos actualizar, para evitar que se actualicen campos que no queremos que se actualicen, si no valdría con _orderService.UpdateOrderAsync(OrderHeader);
+
+            var orderHeaderFromDb = await _orderService.GetOrderByIdAsync(OrderHeader.Id);
+            orderHeaderFromDb.Name = OrderHeader.Name;
+            orderHeaderFromDb.PhoneNumber = OrderHeader.PhoneNumber;
+            orderHeaderFromDb.StreetAddress = OrderHeader.StreetAddress;
+            orderHeaderFromDb.City = OrderHeader.City;
+            orderHeaderFromDb.State = OrderHeader.State;
+            orderHeaderFromDb.PostalCode = OrderHeader.PostalCode;
+            if (!string.IsNullOrEmpty(OrderHeader.Carrier) && orderHeaderFromDb.OrderStatus == SD.StatusShipped)
+            {
+                orderHeaderFromDb.Carrier = OrderHeader.Carrier;
+            }
+            if (!string.IsNullOrEmpty(OrderHeader.TrackingNumber) && orderHeaderFromDb.OrderStatus == SD.StatusShipped)
+            {
+                orderHeaderFromDb.TrackingNumber = OrderHeader.TrackingNumber;
+            }
+            await _orderService.UpdateOrderAsync(orderHeaderFromDb);
+            TempData["success"] = "Order details updated successfully";
+
+            return RedirectToAction(nameof(Details), new { orderId = orderHeaderFromDb.Id });
+        }
+
 
         // API CALLS to get all orders to datatable
         #region "API CALLS"

@@ -36,7 +36,7 @@ namespace BulkyBook.Business.Services
             {
                 query = query.Where(u => u.ApplicationUserId == userId);
             }
-            if (!string.IsNullOrEmpty(status) && status.ToLower()!="all")
+            if (!string.IsNullOrEmpty(status) && status.ToLower() != "all")
             {
                 query = query.Where(u => u.OrderStatus.ToLower() == status.ToLower());
             }
@@ -56,6 +56,13 @@ namespace BulkyBook.Business.Services
             }
 
             return await query.FirstOrDefaultAsync(u => u.Id == id);
+
+        }
+
+        public async Task UpdateOrderAsync(OrderHeader ordeHeader)
+        {
+            _context.OrderHeaders.Update(ordeHeader);
+            await _context.SaveChangesAsync();
 
         }
 

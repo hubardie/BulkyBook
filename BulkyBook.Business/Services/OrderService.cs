@@ -67,7 +67,7 @@ namespace BulkyBook.Business.Services
 
         }
 
-        public async Task UpdateOrderStatus(int id, string orderStatus, string? carrier = null, string? trackingNumber = null)
+        public async Task UpdateOrderStatusAsync(int id, string orderStatus, string? carrier = null, string? trackingNumber = null)
         {
             var orderHeaderFromDb = await _context.OrderHeaders.FirstOrDefaultAsync(u => u.Id == id);
             if (orderHeaderFromDb == null)

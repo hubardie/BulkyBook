@@ -59,6 +59,55 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
             return RedirectToAction(nameof(Details), new { orderId = orderHeaderFromDb.Id });
         }
 
+        [HttpPost]
+        [Authorize(Roles = SD.RoleAdmin + "," + SD.RoleEmployee)] // Employee and admin can update order status
+        public async Task<IActionResult> UpdateOrderStatus(string status)
+        {
+            // Mapeamos manualmente los campos que queremos actualizar, para evitar que se actualicen campos que no queremos que se actualicen, si no valdría con _orderService.UpdateOrderAsync(OrderHeader);
+
+            var orderHeaderFromDb = await _orderService.GetOrderByIdAsync(OrderHeader.Id);
+            if(orderHeaderFromDb == null)
+            {
+                TempData["error"] = "Order not found";
+                return RedirectToAction(nameof(Index));
+            }
+            string successMessage = "";
+            switch (status)
+            {
+                case SD.StatusProcessing:
+                    await _orderService.UpdateOrderStatusAsync(OrderHeader.Id, status);
+                    successMessage = "Order processing started successfully";
+                    break                        ;
+
+                case SD.StatusCancelled:
+                    await _orderService.UpdateOrderStatusAsync(OrderHeader.Id, status);
+                    successMessage = "Order cancelled successfully";
+                    break;
+                case SD.StatusRefunded:
+                    await _orderService.UpdateOrderStatusAsync(OrderHeader.Id, status);
+                    successMessage = "Order refunded successfully";
+                    break;
+
+                case SD.StatusShipped:
+                    if(string.IsNullOrEmpty(OrderHeader.Carrier) || string.IsNullOrEmpty(OrderHeader.TrackingNumber))
+                    {
+                        TempData["error"] = "Please provide both Carrier and Tracking Number";
+                        return RedirectToAction(nameof(Details), new { orderId = OrderHeader.Id });
+                    }
+
+                    await _orderService.UpdateOrderStatusAsync(OrderHeader.Id, status, OrderHeader.Carrier, OrderHeader.TrackingNumber);
+                    successMessage = "Order shipped successfully";
+                    break;
+
+                default:
+                    TempData["error"] = "Invalid status";
+                    return RedirectToAction(nameof(Details), new { orderId = OrderHeader.Id });
+            }
+
+            TempData["success"] = successMessage;
+            return RedirectToAction(nameof(Details), new { orderId = OrderHeader.Id });
+        }
+
 
         // API CALLS to get all orders to datatable
         #region "API CALLS"

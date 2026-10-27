@@ -159,7 +159,8 @@
                             }
                             @if (Model.OrderStatus == SD.StatusProcessing)
                             {
-                                <button type="submit" asp-action="UpdateOrderStatus" asp-route-status="@SD.StatusShipped" onclick="return validateInput()" class="btn btn-warning fw-semibold">
+                                <!-- <button type="submit" asp-action="UpdateOrderStatus" asp-route-status="@SD.StatusShipped" onclick="return validateInput()" class="btn btn-warning fw-semibold"> -->
+                                <button type="submit" asp-action="UpdateOrderStatus" asp-route-status="@SD.StatusShipped"  class="btn btn-warning fw-semibold">
                                     Ship Order
                                 </button>
                             }

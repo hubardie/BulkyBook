@@ -168,8 +168,8 @@
                                 <button type="submit" asp-action="UpdateOrderStatus" asp-route-status="@SD.StatusCancelled" class="btn btn-danger fw-semibold">
                                     Cancel Order
                                 </button>
-                            }                              
-                                                         
+                            }
+
                         </div>
                     </div>
                 </div>
@@ -179,4 +179,18 @@
 </div>
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        function validateInput() {
+            const carrier = document.getElementById("carrier").value.trim();
+            const trackingNumber = document.getElementById("trackingNumber").value.trim();
+
+            if (!carrier || !trackingNumber) {
+                alert("Introduce el transportista y el número de seguimiento.");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
 }

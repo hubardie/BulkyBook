@@ -19,5 +19,10 @@ namespace BulkyBook.Business.Services
         {
             return await _context.ApplicationUsers.FirstOrDefaultAsync(u => u.Id == userId);
         }
+
+        public async Task<IEnumerable<ApplicationUser>> GetAllUsersAsync()
+        {
+            return await _context.ApplicationUsers.ToListAsync();
+        }
     }
 }

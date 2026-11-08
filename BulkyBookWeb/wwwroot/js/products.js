@@ -2,7 +2,7 @@
 
 $(document).ready(function () {
     loadDataTable();
-}
+});
 
 function loadDatatable() {
 
@@ -30,7 +30,6 @@ function loadDatatable() {
                 }
             ]
         });
-
     }
 
 

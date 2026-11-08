@@ -9,7 +9,7 @@ function loadDataTable() {
         columns: [
             { data: 'name', "width": "25%" },
             { data: 'email', "width": "15%" },
-            { data: 'phonenumber', "width": "10%"},
+            { data: 'phoneNumber', "width": "10%"},
             {
                 data: 'role', "width": "10%", "render": function (data) { return '<span class="badge bg-secondary">' + data + '</span>'; }
             },

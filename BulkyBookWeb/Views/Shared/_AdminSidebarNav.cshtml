@@ -19,11 +19,11 @@
 
     <!-- TODO: Show Management section only for Admin role -->
     @if (User.IsInRole(SD.RoleAdmin))
-{
+    {
+        <p class="nav-section mb-1">Management</p>
+        <a asp-area="Admin" asp-controller="User" asp-action="Index" class="nav-link d-flex align-items-center gap-2">
+            <i class="bi bi-people"></i> Users
+        </a>
+    }
 
-}
-    <p class="nav-section mb-1">Management</p>
-    <a asp-area="Admin" asp-controller="User" asp-action="Index" class="nav-link d-flex align-items-center gap-2">
-        <i class="bi bi-people"></i> Users
-    </a>
 </div>

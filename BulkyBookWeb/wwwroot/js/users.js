@@ -15,9 +15,14 @@ function loadDataTable() {
             },
             {
                 data: 'id', "width": "25%", "render": function (data) {
+
+                    let today = new Date().getTime();
+                    let lockedout = new Date(data.lockoutEnd).getTime();
+                    let isLocked = lockout > today;
+
                     return `<div class="d-flex gap-2 justify-content-end">
-                            <a onclick="LockUnlock('${data}')" class="btn btn-sm btn-outline-success">
-                                 <i class="bi bi-pencil-square"></i> Lock Unlock
+                            <a onclick="LockUnlock('${data}')" class="btn btn-sm ${isLocked ? 'btn-danger' : 'btn-success'}">
+                                 <i class="bi bi-${isLocked ? 'unlock' : 'lock'}-fill"></i> ${isLocked ? 'Unlock' : 'Lock'}
                             </a>
                             <a href="/admin/user/RoleManagement?userId=${data}" class="btn btn-sm btn-outline-secondary">
                                  <i class="bi bi-person-badge"></i> Role

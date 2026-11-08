@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace BulkyBook.Models.ViewModels
 {
-    public  class PasswordChangePasswordVM
+    public  class AdminChangePasswordVM
     {
         public string UserId { get; set; }
         [Display(Name = "User Email")]

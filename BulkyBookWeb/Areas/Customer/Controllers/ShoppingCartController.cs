@@ -77,8 +77,6 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             shopppingCartVM.OrderHeader.OrderDate = DateTime.UtcNow;
             shopppingCartVM.OrderHeader.ApplicationUserId = userId;
 
-
-
             foreach (var cart in shopppingCartVM.ShoppingCartList)
             {
                 shopppingCartVM.OrderHeader.OrderTotal += (cart.Price * cart.Count);

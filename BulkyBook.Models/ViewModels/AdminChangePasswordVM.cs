@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace BulkyBook.Models.ViewModels
 {
@@ -8,8 +7,6 @@ namespace BulkyBook.Models.ViewModels
         public string UserId { get; set; }
         [Display(Name = "User Email")]
         public string UserEmail { get; set; }
-        [Display(Name = "User Name")]
-        public string UserName { get; set; }
         [Required]
         [DataType(DataType.Password)]
         [Display(Name = "New Password")]
@@ -17,8 +14,8 @@ namespace BulkyBook.Models.ViewModels
 
         [DataType(DataType.Password)]
         [Display(Name = "Confirm New Password")]
-        [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
-        public string ConfirmPassword { get; set; }        
+        [Compare("NewPassword", ErrorMessage = "The password and confirmation password do not match.")]
+        public string ConfirmPassword { get; set; }
 
 
     }

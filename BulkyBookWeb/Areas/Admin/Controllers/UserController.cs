@@ -72,7 +72,7 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
         public async Task<IActionResult> ChangePassword(string userId)
-        {
+        {            
             var user = await _userService.GetUserByIdAsync(userId);
             if (user == null)
             {

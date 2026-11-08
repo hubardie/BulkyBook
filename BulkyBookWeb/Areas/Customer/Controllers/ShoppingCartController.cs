@@ -109,6 +109,7 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
                 {
                     cart.Count++;
                     await _shoppingCartService.UpdateCartAsync(cart);
+                    await UpdateCartSessionAsync();
                 }
             }
             return RedirectToAction(nameof(Index));
@@ -121,6 +122,7 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             {
                 cart.Count--;
                 await _shoppingCartService.UpdateCartAsync(cart);
+                await UpdateCartSessionAsync();
             }
             return RedirectToAction(nameof(Index));
         }
@@ -132,6 +134,7 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             {
                 cart.Count = 0;
                 await _shoppingCartService.UpdateCartAsync(cart);
+                await UpdateCartSessionAsync();
             }
             return RedirectToAction(nameof(Index));
         }

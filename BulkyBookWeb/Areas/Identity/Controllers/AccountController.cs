@@ -1,10 +1,11 @@
-﻿using BulkyBook.Models;
+﻿using BulkyBook.Business.IServices;
+using BulkyBook.Models;
 using BulkyBook.Models.ViewModels;
 using BulkyBook.Utility;
-using BulkyBookWeb.Areas.Customer.Controllers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Security.Claims;
 
 
 namespace BulkyBookWeb.Areas.Identity.Controllers
@@ -15,12 +16,15 @@ namespace BulkyBookWeb.Areas.Identity.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IShoppingCartService _shoppingCartService;
 
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager)
+
+        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager, IShoppingCartService shoppingCartService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
+            _shoppingCartService = shoppingCartService;
         }
 
         public IActionResult Login(string? returnUrl = null)
@@ -37,7 +41,14 @@ namespace BulkyBookWeb.Areas.Identity.Controllers
             {
                 var result = await _signInManager.PasswordSignInAsync(loginVM.Email, loginVM.Password, loginVM.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
-                {
+                {                    
+                    var user = await _userManager.FindByEmailAsync(loginVM.Email);
+                    if (user != null)
+                    {
+                        var count = await _shoppingCartService.GetCartCountAsync(user.Id);
+                        HttpContext.Session.SetInt32(SD.SessionCart, count);
+                    }
+
                     // Redirect to returnUrl if valid, Home otherwise
                     if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                     {
@@ -80,7 +91,6 @@ namespace BulkyBookWeb.Areas.Identity.Controllers
                 await _roleManager.CreateAsync(new IdentityRole(SD.RoleCustomer));
             }
 
-
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser
@@ -106,6 +116,7 @@ namespace BulkyBookWeb.Areas.Identity.Controllers
 
                     // user has been created
                     await _signInManager.SignInAsync(user, isPersistent: false);
+                    HttpContext.Session.SetInt32(SD.SessionCart, 0);
 
                     if (!string.IsNullOrEmpty(returnUrl))
                     {
@@ -129,6 +140,7 @@ namespace BulkyBookWeb.Areas.Identity.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
+            HttpContext.Session.SetInt32(SD.SessionCart, 0);
             return RedirectToAction(nameof(Index), "Home", new { area = "Customer" });
         }
     }

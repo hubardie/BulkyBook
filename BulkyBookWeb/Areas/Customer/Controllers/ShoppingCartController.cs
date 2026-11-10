@@ -15,13 +15,14 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
         private readonly IShoppingCartService _shoppingCartService;
         private readonly IApplicationUserService _applicationUserService;
         private readonly IOrderService _orderService;
+        private readonly IEmailService _emailService;
 
-
-        public ShoppingCartController(IShoppingCartService shoppingCartService, IApplicationUserService applicationUserService, IOrderService orderService  )
+        public ShoppingCartController(IShoppingCartService shoppingCartService, IApplicationUserService applicationUserService, IOrderService orderService, IEmailService emailService)
         {
             _shoppingCartService = shoppingCartService;
             _applicationUserService = applicationUserService;
             _orderService = orderService;
+            _emailService = emailService;
         }
 
         public async Task<IActionResult> Index()
@@ -91,6 +92,8 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             }).ToList();
             // Create order
             await _orderService.CreateOrderAsync(shopppingCartVM.OrderHeader);
+            var user = await _applicationUserService.GetUserByIdAsync(userId);
+            await _emailService.SendOrderConfirmationEmailAsync(user.Email, shopppingCartVM.OrderHeader.Id, (decimal)shopppingCartVM.OrderHeader.OrderTotal);
             return RedirectToAction(nameof(OrderConfirmation), new { orderHeaderId = shopppingCartVM.OrderHeader.Id});
 
         }

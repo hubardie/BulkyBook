@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace BulkyBook.Business.IServices
+﻿namespace BulkyBook.Business.IServices
 {
     public interface IEmailService
     {

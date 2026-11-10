@@ -1,4 +1,7 @@
 ﻿using BulkyBook.Business.IServices;
+using Mailjet.Client;
+using Mailjet.Client.TransactionalEmails;
+using Mailjet.Client.TransactionalEmails.Response;
 using Microsoft.Extensions.Configuration;
 
 
@@ -21,14 +24,54 @@ namespace BulkyBook.Business.Services
             _senderName = _configuration["Mailjet:SenderName"];
         }
 
-        public Task<bool> SendEmailAsync(string toEmail, string subject, string htmlContent)
+        public async Task<bool> SendEmailAsync(string toEmail, string subject, string htmlContent)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var fromSendContact = new SendContact(_senderEmail, _senderEmail);
+                var ToSendContact = new SendContact(toEmail);
+
+                MailjetClient client = new MailjetClient(_apiKey, _secretKey);
+                var email = new TransactionalEmailBuilder().
+                    WithFrom(fromSendContact).WithTo(ToSendContact).WithSubject(subject).WithHtmlPart(htmlContent).Build();
+
+                var response = await client.SendTransactionalEmailAsync(email);
+
+                if (response.Messages != null && response.Messages.Length > 0)
+                {
+                    var message = response.Messages[0];
+                    if (message.Status == "success")
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
-        public Task<bool> SendOrderConfirmationEmailAsync(string toEmail, int orderId, decimal orderTotal)
+        public async Task<bool> SendOrderConfirmationEmailAsync(string toEmail, int orderId, decimal orderTotal)
         {
-            throw new NotImplementedException();
+            var subject = $"Order Confirmation #{orderId} - BulkyBook";
+
+            var htmlContent = $@"
+                <h1>Thank you for your order!</h1>
+                <p>Your order has been placed successfully.</p>
+                <hr/>
+                <p><strong>Order Number:</strong> {orderId}</p>
+                <p><strong>Order Date:</strong> {DateTime.Now:MMM: dd, yyy}</p>
+                <hr/>
+                <p>Thank you for shopping with BulkyBook!</p>
+                <p>- The BulkyBook Team</p>";
+
+            return await SendEmailAsync(toEmail, subject, htmlContent);
         }
     }
 }

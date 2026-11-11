@@ -1,12 +1,9 @@
-﻿using BulkyBook.Business.IServices;
-using BulkyBook.Models;
+﻿using BulkyBook.Models;
 using BulkyBook.Models.ViewModels;
 using BulkyBook.Utility;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Security.Claims;
-
 
 namespace BulkyBookWeb.Areas.Identity.Controllers
 {
@@ -39,20 +36,21 @@ namespace BulkyBookWeb.Areas.Identity.Controllers
             {
                 var result = await _signInManager.PasswordSignInAsync(loginVM.Email, loginVM.Password, loginVM.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
-                {                    
-                    // Redirect to returnUrl if valid, Home otherwise
+                {
+                    // Redirect to returnUrl if valid, otherwise: Dashboard if admin or employee, home page if customer
                     if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                     {
                         return Redirect(returnUrl);
                     }
+                    if (User.IsInRole(SD.RoleAdmin) || User.IsInRole(SD.RoleEmployee))
+                    {
+                        return RedirectToAction(nameof(Index), "Dashboard", new { area = "Admin" });
+                    }
                     return RedirectToAction(nameof(Index), "Home", new { area = "Customer" });
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Invalid login attemp.");
                 }
             }
 
+            ModelState.AddModelError(string.Empty, "Invalid login attemp.");
             return View();
         }
         public IActionResult Register(string? returnUrl = null)

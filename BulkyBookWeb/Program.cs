@@ -88,5 +88,5 @@ app.MapControllerRoute(
     defaults: new { area = "Customer" })
     .WithStaticAssets();
 
-
+// Run
 app.Run();

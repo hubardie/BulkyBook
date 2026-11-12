@@ -1,4 +1,5 @@
-﻿using BulkyBook.DataAccess.Data;
+﻿using BulkyBook.Business.Services;
+using BulkyBook.DataAccess.Data;
 using BulkyBook.Models.ViewModels;
 using BulkyBook.Utility;
 using Microsoft.AspNetCore.Mvc;
@@ -52,8 +53,37 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
                 return new { Label = month.ToString("MMM yyyy"), Revenue = revenue };
             }).ToList();
 
+            // Oders by month (last 6 months)
+            var monthlyOrders = Enumerable.Range(0, 6).Select(i =>
+            {
+                var month = sixMonthsAgo.AddMonths(i);
+                var orderCount = orders
+                .Count(o => o.OrderDate.Year == month.Year && o.OrderDate.Month == month.Month && (o.OrderStatus == SD.StatusApproved || o.OrderStatus == SD.StatusShipped));
+                return new {
+                    Label = month.ToString("MMM yyyy"), 
+                    Count = orderCount };
+            }).ToList();
+
+            // Order status breakdown
+            var statusBreakdown = orders
+                .GroupBy(o => o.OrderStatus ?? "Unknown")
+                .Select(g => new { 
+                    Status = g.Key, 
+                    Count = g.Count() })
+                .ToList();
+
+            // Products per category
+            var productsPerCategory = categories.Select(c => new
+            {
+                Category = c.Name,
+                Count = products.Count(p => p.CategoryId == c.Id)
+            }).ToList();
+
             return Json(new {
-                monthlyRevenue
+                monthlyRevenue,
+                monthlyOrders,
+                statusBreakdown,
+                productsPerCategory
             });
 
         }

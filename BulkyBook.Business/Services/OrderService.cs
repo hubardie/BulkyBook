@@ -94,7 +94,7 @@ namespace BulkyBook.Business.Services
 
         }
 
-        public async Task UpdatePaymentAsync(int orderId, string sessionId, string paymentIntentId)
+        public async Task UpdateStripePaymentAsync(int orderId, string sessionId, string paymentIntentId)
         {
             var order = await _context.OrderHeaders.FindAsync(orderId);
 

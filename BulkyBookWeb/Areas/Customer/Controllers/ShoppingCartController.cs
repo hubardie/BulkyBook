@@ -2,6 +2,7 @@ using BulkyBook.Business.IServices;
 using BulkyBook.Models;
 using BulkyBook.Models.ViewModels;
 using BulkyBook.Utility;
+using Mailjet.Client.Resources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Stripe;
@@ -133,21 +134,26 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
 
                 var service = new SessionService();
                 Session session = service.Create(options);
+                await _orderService.UpdateStripePaymentAsync(shopppingCartVM.OrderHeader.Id, session.Id, session.PaymentIntentId);
+
+                Response.Headers.Append("Location", session.Url);
+                return new StatusCodeResult(303); // after Post endpoint to prevent resubmissions
+
             }
             catch (Exception ex)
             {
-
+                TempData["error"] = "Payment processing failed. Please try again."                    ;
+                return RedirectToAction(nameof(Index));
             }
-
-
-            var user = await _applicationUserService.GetUserByIdAsync(userId);
-            await _emailService.SendOrderConfirmationEmailAsync(user.Email, shopppingCartVM.OrderHeader.Id, (decimal)shopppingCartVM.OrderHeader.OrderTotal);
-            return RedirectToAction(nameof(OrderConfirmation), new { orderHeaderId = shopppingCartVM.OrderHeader.Id });
-
         }
 
         public async Task<IActionResult> OrderConfirmation(int orderHeaderId)
         {
+
+
+            //var user = await _applicationUserService.GetUserByIdAsync(userId);
+            //await _emailService.SendOrderConfirmationEmailAsync(user.Email, shopppingCartVM.OrderHeader.Id, (decimal)shopppingCartVM.OrderHeader.OrderTotal);
+        
             return View(orderHeaderId);
         }
 

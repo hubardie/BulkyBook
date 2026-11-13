@@ -12,7 +12,7 @@ namespace BulkyBook.Business.IServices
 
         Task UpdateOrderAsync(OrderHeader orderHeader);
         Task UpdateOrderStatusAsync(int id, string orderStatus, string? carrier = null, string? trackingNumber = null);
-        Task UpdatePaymentAsync(int orderId, string sessionId, string paymentIntentId);
+        Task UpdateStripePaymentAsync(int orderId, string sessionId, string paymentIntentId);
 
 
     }

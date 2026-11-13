@@ -4,6 +4,8 @@ using BulkyBook.Models.ViewModels;
 using BulkyBook.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Stripe;
+using Stripe.Checkout;
 using System.Security.Claims;
 
 namespace BulkyBookWeb.Areas.Customer.Controllers
@@ -56,7 +58,7 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             foreach (var cart in cartVM.ShoppingCartList)
             {
                 cartVM.OrderHeader.OrderTotal += (cart.Price * cart.Count);
-            
+
             }
             return View(cartVM);
         }
@@ -82,7 +84,7 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             {
                 shopppingCartVM.OrderHeader.OrderTotal += (cart.Price * cart.Count);
             }
-            shopppingCartVM.OrderHeader.OrderStatus = SD.StatusApproved;
+            shopppingCartVM.OrderHeader.OrderStatus = SD.StatusPending;
             shopppingCartVM.OrderHeader.OrderDetails = shopppingCartVM.ShoppingCartList.Select(cart => new OrderDetails
             {
                 ProductId = cart.ProductId,
@@ -92,9 +94,55 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             }).ToList();
             // Create order
             await _orderService.CreateOrderAsync(shopppingCartVM.OrderHeader);
+
+            try
+            {
+                var domain = Request.Scheme + "://" + Request.Host.Value + "/";
+
+                var options = new SessionCreateOptions
+                {
+                    SuccessUrl = domain + "Customer/ShoppingCart/OrderConfirmation?orderHeaderId=" + shopppingCartVM.OrderHeader.Id,
+                    CancelUrl = domain + "Customer/ShoppingCart/Index",
+                    LineItems = new List<SessionLineItemOptions>(),
+                    Mode = "payment",
+                    Metadata = new Dictionary<string, string>
+                    {
+                        { "OrderId", shopppingCartVM.OrderHeader.Id.ToString() }
+                    }
+                };
+
+                foreach (var item in shopppingCartVM.ShoppingCartList)
+                {
+                    var sessionLineItem = new SessionLineItemOptions
+                    {
+                        PriceData = new SessionLineItemPriceDataOptions
+                        {
+                            UnitAmount = (long)(item.Price * 100), // Stripe expects amount in cents
+                            Currency = "eur",
+                            ProductData = new SessionLineItemPriceDataProductDataOptions
+                            {
+                                Name = item.Product.Title
+                            }
+
+                        },
+                        Quantity = item.Count,
+
+                    };
+                    options.LineItems.Add(sessionLineItem);
+                }
+
+                var service = new SessionService();
+                Session session = service.Create(options);
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+
             var user = await _applicationUserService.GetUserByIdAsync(userId);
             await _emailService.SendOrderConfirmationEmailAsync(user.Email, shopppingCartVM.OrderHeader.Id, (decimal)shopppingCartVM.OrderHeader.OrderTotal);
-            return RedirectToAction(nameof(OrderConfirmation), new { orderHeaderId = shopppingCartVM.OrderHeader.Id});
+            return RedirectToAction(nameof(OrderConfirmation), new { orderHeaderId = shopppingCartVM.OrderHeader.Id });
 
         }
 
@@ -108,7 +156,7 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             var cart = await _shoppingCartService.GetShoppingCartByIdAsync(cartId);
             if (cart != null)
             {
-                if(cart.Count < 1000)
+                if (cart.Count < 1000)
                 {
                     cart.Count++;
                     await _shoppingCartService.UpdateCartAsync(cart);
@@ -121,7 +169,7 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
         public async Task<IActionResult> Minus(int cartId)
         {
             var cart = await _shoppingCartService.GetShoppingCartByIdAsync(cartId);
-            if (cart != null && cart?.Count>0)
+            if (cart != null && cart?.Count > 0)
             {
                 cart.Count--;
                 await _shoppingCartService.UpdateCartAsync(cart);
@@ -185,4 +233,3 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
 
     }
 }
- 

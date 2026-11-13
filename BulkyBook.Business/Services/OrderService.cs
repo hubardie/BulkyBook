@@ -3,6 +3,7 @@ using BulkyBook.DataAccess.Data;
 using BulkyBook.Models;
 using BulkyBook.Utility;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client.AppConfig;
 
 namespace BulkyBook.Business.Services
 {
@@ -93,5 +94,23 @@ namespace BulkyBook.Business.Services
 
         }
 
+        public async Task UpdatePaymentAsync(int orderId, string sessionId, string paymentIntentId)
+        {
+            var order = await _context.OrderHeaders.FindAsync(orderId);
+
+            if(order == null)
+            {
+                throw new KeyNotFoundException($"Order with id {orderId} not found");
+            }
+            if (!string.IsNullOrEmpty(sessionId))
+            {
+                order.SessionId = sessionId;
+            }
+            if (!string.IsNullOrEmpty(paymentIntentId))
+            {
+                order.PaymentIntentId = paymentIntentId;
+            }
+            await _context.SaveChangesAsync();
+        }
     }
 }

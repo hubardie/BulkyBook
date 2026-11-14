@@ -3,6 +3,7 @@ using BulkyBook.Models;
 using BulkyBook.Models.ViewModels;
 using BulkyBook.Utility;
 using Mailjet.Client.Resources;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Stripe;
@@ -149,11 +150,45 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
 
         public async Task<IActionResult> OrderConfirmation(int orderHeaderId)
         {
+            var orderHeader = await _orderService.GetOrderByIdAsync(orderHeaderId, includeUser: true);
+            if (orderHeader == null)
+            {
+                return NotFound();
+            }
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+            if (orderHeader.ApplicationUserId != userId) // Check if the loged user is the same as the user who placed the order
+            {
+                return RedirectToAction("AccessDenied", "Account", new { area = "Identity" });
+            }
+            try 
+            {
+                var service = new SessionService();
+                Session session = service.Get(orderHeader.SessionId);
+                if (session.PaymentStatus.ToLower() == "paid")
+                {
+                    await _orderService.UpdateStripePaymentAsync(orderHeaderId, session.Id, session.PaymentIntentId);
+                    await _orderService.UpdateOrderStatusAsync(orderHeaderId, SD.StatusApproved);
+                    TempData["success"] = "Payment completed successfully. Your order has been confirmed.";
+                }
+                else
+                {
+                    TempData["warning"] = "Payment status is pending. Please contact support if you completed the payment.";
+                }
 
-            //var user = await _applicationUserService.GetUserByIdAsync(userId);
-            //await _emailService.SendOrderConfirmationEmailAsync(user.Email, shopppingCartVM.OrderHeader.Id, (decimal)shopppingCartVM.OrderHeader.OrderTotal);
-        
+            }
+            catch (Exception ex)
+            {
+                TempData["error"] = "Unable to verify payment status. Please contact support with your order number.";
+            }
+            var user = await _applicationUserService.GetUserByIdAsync(userId);
+            await _emailService.SendOrderConfirmationEmailAsync(user.Email, orderHeader.Id, (decimal)orderHeader.OrderTotal);
+
             return View(orderHeaderId);
         }
 

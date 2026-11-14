@@ -143,7 +143,7 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             }
             catch (Exception ex)
             {
-                TempData["error"] = "Payment processing failed. Please try again."                    ;
+                TempData["error"] = "Payment processing failed. Please try again.";
                 return RedirectToAction(nameof(Index));
             }
         }
@@ -166,28 +166,28 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             {
                 return RedirectToAction("AccessDenied", "Account", new { area = "Identity" });
             }
-            try 
+            try
             {
                 var service = new SessionService();
-                Session session = service.Get(orderHeader.SessionId);
+                Session session = service.Get(orderHeader.SessionId);   
+
                 if (session.PaymentStatus.ToLower() == "paid")
                 {
                     await _orderService.UpdateStripePaymentAsync(orderHeaderId, session.Id, session.PaymentIntentId);
                     await _orderService.UpdateOrderStatusAsync(orderHeaderId, SD.StatusApproved);
-                    TempData["success"] = "Payment completed successfully. Your order has been confirmed.";
+                    TempData["success"] = "Payment completed successfully! Your order has been confirmed.";
+                    var user = await _applicationUserService.GetUserByIdAsync(userId);
+                    await _emailService.SendOrderConfirmationEmailAsync(user.Email, orderHeader.Id, (decimal)orderHeader.OrderTotal);
                 }
                 else
                 {
                     TempData["warning"] = "Payment status is pending. Please contact support if you completed the payment.";
                 }
-
             }
             catch (Exception ex)
             {
                 TempData["error"] = "Unable to verify payment status. Please contact support with your order number.";
             }
-            var user = await _applicationUserService.GetUserByIdAsync(userId);
-            await _emailService.SendOrderConfirmationEmailAsync(user.Email, orderHeader.Id, (decimal)orderHeader.OrderTotal);
 
             return View(orderHeaderId);
         }

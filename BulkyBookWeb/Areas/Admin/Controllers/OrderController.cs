@@ -66,7 +66,7 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
             // Mapeamos manualmente los campos que queremos actualizar, para evitar que se actualicen campos que no queremos que se actualicen, si no valdría con _orderService.UpdateOrderAsync(OrderHeader);
 
             var orderHeaderFromDb = await _orderService.GetOrderByIdAsync(OrderHeader.Id);
-            if(orderHeaderFromDb == null)
+            if (orderHeaderFromDb == null)
             {
                 TempData["error"] = "Order not found";
                 return RedirectToAction(nameof(Index));
@@ -77,19 +77,37 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
                 case SD.StatusProcessing:
                     await _orderService.UpdateOrderStatusAsync(OrderHeader.Id, status);
                     successMessage = "Order processing started successfully";
-                    break                        ;
+                    break;
 
                 case SD.StatusCancelled:
-                    await _orderService.UpdateOrderStatusAsync(OrderHeader.Id, status);
-                    successMessage = "Order cancelled successfully";
-                    break;
                 case SD.StatusRefunded:
-                    await _orderService.UpdateOrderStatusAsync(OrderHeader.Id, status);
-                    successMessage = "Order refunded successfully";
+                    try
+                    {
+                        bool refundIssued = await _orderService.CancelOrderWithRefundAsync(OrderHeader.Id);
+                        if (refundIssued)
+                        {
+                            successMessage = "Order cancelled and refund issued successfully. Funds will be returned to customer within 5-10 business days.";
+                        }
+                        else
+                        {
+                            successMessage = "Order cancelled successfully (no payment was processed).";
+                        }
+                    }
+                    catch (InvalidOperationException ex)
+                    {
+                        TempData["error"] =  ex.Message;
+                        return RedirectToAction(nameof(Details), new { orderId = OrderHeader.Id });
+                    }
+                    catch (Stripe.StripeException ex)
+                    {
+                        TempData["error"] = $"Order cancelled but refund failed: {ex.Message}. Please process refund manually in Stripe dashboard";
+                        return RedirectToAction(nameof(Details), new { orderId = OrderHeader.Id });
+                    }
+
                     break;
 
                 case SD.StatusShipped:
-                    if(string.IsNullOrEmpty(OrderHeader.Carrier) || string.IsNullOrEmpty(OrderHeader.TrackingNumber))
+                    if (string.IsNullOrEmpty(OrderHeader.Carrier) || string.IsNullOrEmpty(OrderHeader.TrackingNumber))
                     {
                         TempData["error"] = "Please provide both Carrier and Tracking Number";
                         return RedirectToAction(nameof(Details), new { orderId = OrderHeader.Id });
@@ -122,7 +140,7 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
 
                 if (string.IsNullOrEmpty(userId))
                 {
-                    return Unauthorized();                
+                    return Unauthorized();
                 }
             }
 

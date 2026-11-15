@@ -218,7 +218,6 @@ namespace BulkyBook.Business.Services
                     {
                         refundIssued = true;
                         orderHeader.OrderStatus = SD.StatusRefunded;
-                        await _context.SaveChangesAsync();
                     }
 
                 }
@@ -229,6 +228,11 @@ namespace BulkyBook.Business.Services
                     throw new InvalidOperationException($"Stripe refund failed: {ex.Message}. Order has been cancelled, but refund could not be processed.");
                 }
             }
+            else
+            {
+                orderHeader.OrderStatus = SD.StatusCancelled;
+            }
+            await _context.SaveChangesAsync();
 
             return refundIssued;
         }

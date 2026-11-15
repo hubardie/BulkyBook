@@ -101,47 +101,13 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             {
                 var domain = Request.Scheme + "://" + Request.Host.Value + "/";
 
-                var options = new SessionCreateOptions
-                {
-                    SuccessUrl = domain + "Customer/ShoppingCart/OrderConfirmation?orderHeaderId=" + shopppingCartVM.OrderHeader.Id,
-                    CancelUrl = domain + "Customer/ShoppingCart/Index",
-                    LineItems = new List<SessionLineItemOptions>(),
-                    Mode = "payment",
-                    Metadata = new Dictionary<string, string>
-                    {
-                        { "OrderId", shopppingCartVM.OrderHeader.Id.ToString() }
-                    }
-                };
+                var sessionUrl = await _orderService.CreateStripeCheckoutSessionAsync(shopppingCartVM.OrderHeader, shopppingCartVM.ShoppingCartList, domain);
 
-                foreach (var item in shopppingCartVM.ShoppingCartList)
-                {
-                    var sessionLineItem = new SessionLineItemOptions
-                    {
-                        PriceData = new SessionLineItemPriceDataOptions
-                        {
-                            UnitAmount = (long)(item.Price * 100), // Stripe expects amount in cents
-                            Currency = "eur",
-                            ProductData = new SessionLineItemPriceDataProductDataOptions
-                            {
-                                Name = item.Product.Title
-                            }
-
-                        },
-                        Quantity = item.Count,
-
-                    };
-                    options.LineItems.Add(sessionLineItem);
-                }
-
-                var service = new SessionService();
-                Session session = service.Create(options);
-                await _orderService.UpdateStripePaymentAsync(shopppingCartVM.OrderHeader.Id, session.Id, session.PaymentIntentId);
-
-                Response.Headers.Append("Location", session.Url);
+                Response.Headers.Append("Location", sessionUrl);
                 return new StatusCodeResult(303); // after Post endpoint to prevent resubmissions
 
             }
-            catch (Exception ex)
+            catch (StripeException ex)
             {
                 TempData["error"] = "Payment processing failed. Please try again.";
                 return RedirectToAction(nameof(Index));
@@ -168,23 +134,20 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             }
             try
             {
-                var service = new SessionService();
-                Session session = service.Get(orderHeader.SessionId);   
-
-                if (session.PaymentStatus.ToLower() == "paid")
+                var result = await _orderService.VerifyStripePaymentAsync(orderHeader);
+                if (result)
                 {
-                    await _orderService.UpdateStripePaymentAsync(orderHeaderId, session.Id, session.PaymentIntentId);
-                    await _orderService.UpdateOrderStatusAsync(orderHeaderId, SD.StatusApproved);
                     TempData["success"] = "Payment completed successfully! Your order has been confirmed.";
                     var user = await _applicationUserService.GetUserByIdAsync(userId);
                     await _emailService.SendOrderConfirmationEmailAsync(user.Email, orderHeader.Id, (decimal)orderHeader.OrderTotal);
                 }
-                else
+                else 
                 {
-                    TempData["warning"] = "Payment status is pending. Please contact support if you completed the payment.";
+                    TempData["error"] = "Payment status is pending. Please contact support if you completed the payment.";
                 }
+            
             }
-            catch (Exception ex)
+            catch (StripeException ex)
             {
                 TempData["error"] = "Unable to verify payment status. Please contact support with your order number.";
             }

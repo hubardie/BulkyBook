@@ -103,6 +103,9 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
 
                 var sessionUrl = await _orderService.CreateStripeCheckoutSessionAsync(shopppingCartVM.OrderHeader, shopppingCartVM.ShoppingCartList, domain);
 
+                await _shoppingCartService.ClearCartAsync(userId);
+                HttpContext.Session.SetInt32(SD.SessionCart, 0);
+
                 Response.Headers.Append("Location", sessionUrl);
                 return new StatusCodeResult(303); // after Post endpoint to prevent resubmissions
 

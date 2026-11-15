@@ -4,9 +4,12 @@ using BulkyBook.Models;
 using BulkyBook.Models.ViewModels;
 using BulkyBook.Utility;
 using Mailjet.Client.Resources;
+using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
 using Stripe.Checkout;
 using Stripe.Climate;
+using System.Drawing;
 
 namespace BulkyBook.Business.Services
 {
@@ -101,7 +104,7 @@ namespace BulkyBook.Business.Services
         {
             var order = await _context.OrderHeaders.FindAsync(orderId);
 
-            if(order == null)
+            if (order == null)
             {
                 throw new KeyNotFoundException($"Order with id {orderId} not found");
             }
@@ -125,7 +128,7 @@ namespace BulkyBook.Business.Services
             {
                 await UpdateStripePaymentAsync(orderHeader.Id, session.Id, session.PaymentIntentId);
                 await UpdateOrderStatusAsync(orderHeader.Id, SD.StatusApproved);
-                return true;          
+                return true;
             }
             else
             {
@@ -134,7 +137,8 @@ namespace BulkyBook.Business.Services
         }
         public async Task<string> CreateStripeCheckoutSessionAsync(OrderHeader orderHeader, IEnumerable<ShoppingCart> cartItems, string domain)
         {
-            if (orderHeader == null) { 
+            if (orderHeader == null)
+            {
                 throw new ArgumentNullException(nameof(orderHeader));
             }
             if (cartItems == null || !cartItems.Any())
@@ -180,9 +184,53 @@ namespace BulkyBook.Business.Services
             return session.Url;
         }
 
-        public Task<bool> CancelOrderWIthRefundAsync(int orderId)
+        public async Task<bool> CancelOrderWithRefundAsync(int orderId)
         {
-            throw new NotImplementedException();
+            var orderHeader = await _context.OrderHeaders.FindAsync(orderId);
+            if (orderHeader == null)
+            {
+                throw new KeyNotFoundException($"Order with id {orderId} not found");
+            }
+            if (orderHeader.OrderStatus == SD.StatusShipped)
+            {
+                throw new InvalidOperationException("Cannot cancel orders that have already been shipped. Customer must initiate a refund instead.");
+            }
+            // Check if the order is already cancelled or refunded
+            if (orderHeader.OrderStatus == SD.StatusCancelled || orderHeader.OrderStatus == SD.StatusRefunded)
+            {
+                throw new InvalidOperationException("This order has already been cancelled or refunded.");
+            }
+
+            bool refundIssued = false;
+
+            if (!string.IsNullOrEmpty(orderHeader.PaymentIntentId) &&
+                orderHeader.OrderStatus == SD.StatusApproved ||
+                orderHeader.OrderStatus == SD.StatusProcessing)
+            {
+                try
+                {
+                    // Refund
+                    var options = new RefundCreateOptions { PaymentIntent = orderHeader.PaymentIntentId, Reason = RefundReasons.RequestedByCustomer };
+                    var service = new RefundService();
+                    Refund refund = service.Create(options);
+
+                    if (refund.Status == "succeeded" || refund.Status == "pending")
+                    {
+                        refundIssued = true;
+                        orderHeader.OrderStatus = SD.StatusRefunded;
+                        await _context.SaveChangesAsync();
+                    }
+
+                }
+                catch (StripeException ex)
+                {
+                    orderHeader.OrderStatus = SD.StatusCancelled;
+                    await _context.SaveChangesAsync();
+                    throw new InvalidOperationException($"Stripe refund failed: {ex.Message}. Order has been cancelled, but refund could not be processed.");
+                }
+            }
+
+            return refundIssued;
         }
     }
 }

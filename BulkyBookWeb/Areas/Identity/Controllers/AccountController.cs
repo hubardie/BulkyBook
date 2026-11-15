@@ -55,15 +55,20 @@ namespace BulkyBookWeb.Areas.Identity.Controllers
         }
         public IActionResult Register(string? returnUrl = null)
         {
-            var model = new RegisterVM
+            var model = new RegisterVM();
+            if (User.IsInRole(SD.RoleAdmin))
             {
-                RoleList = new List<SelectListItem>
-                {
+                model.RoleList =
+                    [
                     new SelectListItem { Text = SD.RoleAdmin, Value =  SD.RoleAdmin },
                     new SelectListItem { Text = SD.RoleCustomer, Value =  SD.RoleCustomer },
-                    new SelectListItem { Text = SD.RoleEmployee, Value =  SD.RoleEmployee },
-                }
-            };
+                    new SelectListItem { Text = SD.RoleEmployee, Value =  SD.RoleEmployee }
+                  ];
+            }
+            else
+            {
+                model.RoleList = new List<SelectListItem>();
+            }
 
             ViewData["ReturnUrl"] = returnUrl;
             return View(model);
@@ -96,20 +101,26 @@ namespace BulkyBookWeb.Areas.Identity.Controllers
                 var result = await _userManager.CreateAsync(user, password: registerVM.Password);
                 if (result.Succeeded)
                 {
-                    if (string.IsNullOrEmpty(registerVM.Role))
+                    if (User.IsInRole(SD.RoleAdmin) && !string.IsNullOrEmpty(registerVM.Role))
                     {
+                        // User is being created by an admin
+                        await _userManager.AddToRoleAsync(user, registerVM.Role);
+                        TempData["success"] = $"User '{user.Name}' created succesfully with role '{registerVM.Role}'";
+                        return RedirectToAction(nameof(Index), "User", new { area = "Admin" });
+                    }
+                    else
+                    {
+                        // User created by self registration
                         registerVM.Role = SD.RoleCustomer;
-                    }
-                    await _userManager.AddToRoleAsync(user, registerVM.Role);
+                        await _userManager.AddToRoleAsync(user, registerVM.Role);
+                        await _signInManager.SignInAsync(user, isPersistent: false);
 
-                    // user has been created
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-
-                    if (!string.IsNullOrEmpty(returnUrl))
-                    {
-                        return Redirect(returnUrl);
+                        if (!string.IsNullOrEmpty(returnUrl))
+                        {
+                            return Redirect(returnUrl);
+                        }
+                        return RedirectToAction(nameof(Index), "Home", new { area = "Customer" });
                     }
-                    return RedirectToAction(nameof(Index), "Home", new { area = "Customer" });
                 }
 
                 foreach (var error in result.Errors)

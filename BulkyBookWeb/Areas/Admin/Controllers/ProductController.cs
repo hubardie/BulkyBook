@@ -69,17 +69,24 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
                     string productPath = Path.Combine("images", "products");
                     string finalPath = Path.Combine(wwwRootPath, productPath);
 
-
-                    if (!Directory.Exists(finalPath))
+                    try
                     {
-                        Directory.CreateDirectory(finalPath);
+                        if (!Directory.Exists(finalPath))
+                        {
+                            Directory.CreateDirectory(finalPath);
+                        }
+                        // save the new image
+                        using (var fileStream = new FileStream(Path.Combine(finalPath, fileName), FileMode.Create))
+                        {
+                            file.CopyTo(fileStream);
+                        }
+                        productVM.Product.ImageUrl = Path.Combine(@"\", productPath, fileName).Replace("\\", "/");
                     }
-                    // save the new image
-                    using (var fileStream = new FileStream(Path.Combine(finalPath, fileName), FileMode.Create))
+                    catch (Exception ex)
                     {
-                        file.CopyTo(fileStream);
+                        TempData["error"] = $"Error uploading image: {ex.Message}";
+                        return View(productVM);
                     }
-                    productVM.Product.ImageUrl = Path.Combine(@"\", productPath, fileName).Replace("\\", "/");
 
                 }
                 if (productVM.Product.Id == null)
@@ -134,7 +141,7 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
 
             if (!string.IsNullOrEmpty(productToDelete.ImageUrl))
             {
-                var imagePath = Path.Combine(_webHostEnvironment.WebRootPath, productToDelete.ImageUrl.TrimStart('\\','/'));
+                var imagePath = Path.Combine(_webHostEnvironment.WebRootPath, productToDelete.ImageUrl.TrimStart('\\', '/'));
                 if (System.IO.File.Exists(imagePath))
                 {
                     System.IO.File.Delete(imagePath);

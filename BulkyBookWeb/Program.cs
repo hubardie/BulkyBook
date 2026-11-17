@@ -36,6 +36,8 @@ builder.Services.AddScoped<IShoppingCartService, ShoppingCartService>();
 builder.Services.AddScoped<IApplicationUserService, ApplicationUserService>();
 builder.Services.AddScoped<IEmailService, EmailService> ();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IDbInitializer, DbInitializer>();
+
 
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
@@ -81,7 +83,7 @@ app.UseAuthorization(); // what access does the user have
 
 app.MapStaticAssets();
 
-SeedDatabase();
+await SeedDatabase();
 
 app.MapControllerRoute(
     name: "MyArea",

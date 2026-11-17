@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BulkyBook.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class EntireDataBase : Migration
+    public partial class deploytoazure : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
